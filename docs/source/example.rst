@@ -3,6 +3,7 @@ Usage Example
 
 Simple Client Usage
 -------------------
+.. code:: python
 
     from pyredis import Client
 
@@ -33,6 +34,8 @@ Calling bulk_stop() will fetch all remaining results, and return a list
 with fetched results. This list can also contain exceptions from failed
 commands.
 
+.. code:: python
+
     from pyredis import Client
 
     client = Client(host="localhost")
@@ -46,6 +49,7 @@ commands.
 
 Using a Connection Pool
 -----------------------
+.. code:: python
 
     from pyredis import Pool
 
@@ -58,6 +62,7 @@ Using a Connection Pool
 
 Using a Sentinel backed Connection Pool
 ---------------------------------------
+.. code:: python
 
     from pyredis import SentinelPool
 
@@ -70,6 +75,7 @@ Using a Sentinel backed Connection Pool
 
 Publish Subscribe
 -----------------
+.. code:: python
 
     from pyredis import Client, PubSubClient
 
