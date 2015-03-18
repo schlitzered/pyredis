@@ -1,10 +1,88 @@
 Usage Example
 *************
 
-some description::
+Simple Client Usage
+-------------------
 
     from pyredis import Client
 
-    client = Clinet(host=localhost)
-    client.command.ping()
+    client = Client(host="localhost")
+    client.ping()
+
+
+Bulk Requests
+-------------
+
+Bulk Requests can be used to import large amounts of data in
+a short time. With bulk mode enabled sending requests and
+fetching results is separated from each other. This save some
+network round trips.
+
+All executed commands will return None.
+
+There is a threshold, which defaults to
+5000 requests, after which the results of the previous requests
+are fetched into a list. This can be disabled by calling
+bulk_start with the parameter keep_results=False.
+
+Fetching results, when the threshold is reached is a transparent
+operation. The client will only notice that the execution
+of the the request triggering the threshold will take a little longer.
+
+Calling bulk_stop() will fetch all remaining results, and return a list
+with fetched results. This list can also contain exceptions from failed
+commands.
+
+    from pyredis import Client
+
+    client = Client(host="localhost")
+    client.bulk_start()
+    client.set('key1', 'value1)
+    client.set('key1', 'value1)
+    client.set('key1', 'value1)
+    client.bulk_stop()
+    [b'OK', b'OK', b'OK']
+
+
+Using a Connection Pool
+-----------------------
+
+    from pyredis import Pool
+
+    pool = Pool(host="localhost")
+    client = pool.aquire()
+    client.ping()
+    b'PONG'
+    pool.release(client)
+
+
+Using a Sentinel backed Connection Pool
+---------------------------------------
+
+    from pyredis import SentinelPool
+
+    pool = SentinelPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)])
+    client = pool.aquire()
+    client.ping()
+    b'PONG'
+    pool.release(client)
+
+
+Publish Subscribe
+-----------------
+
+    from pyredis import Client, PubSubClient
+
+    client = Client(host='localhost')
+    subscribe = PubSubClient(host='localhost')
+
+    subscribe.subscribe('/blub')
+    subscribe.get()
+    [b'subscribe', b'/blub', 1]
+
+    client.publish('/blub', 'test')
+    1
+
+    subscribe.get()
+    [b'message', b'/blub', b'test']
 
