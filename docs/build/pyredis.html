@@ -1,0 +1,2472 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API Documentation &mdash; pyredis 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyredis 0.0.1 documentation" href="index.html" />
+    <link rel="prev" title="Usage Example" href="example.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="example.html" title="Usage Example"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="connection">
+<h2>Connection<a class="headerlink" href="#connection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyredis.connection.Connection">
+<em class="property">class </em><tt class="descclassname">pyredis.connection.</tt><tt class="descname">Connection</tt><big>(</big><em>host=None</em>, <em>port=6379</em>, <em>unix_sock=None</em>, <em>database=0</em>, <em>password=None</em>, <em>encoding=None</em>, <em>conn_timeout=2</em>, <em>read_timeout=2</em>, <em>sentinel=False</em><big>)</big><a class="headerlink" href="#pyredis.connection.Connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Low level client for talking to a Redis Server.</p>
+<p>This class is should not be used directly used to talk to a Redis server
+unless you know what you are doing. In most cases it should be
+sufficient to use one of the Client classes, or one of the Connection Pools.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<em>str</em>) &#8211; Host IP or Name to connect to.
+Can only be set when unix_sock is None.</li>
+<li><strong>port</strong> (<em>int</em>) &#8211; Port to connect to, only used when host is also set</li>
+<li><strong>unix_sock</strong> (<em>str</em>) &#8211; Unix Socket to connect to
+Can only be set when host is None.</li>
+<li><strong>database</strong> (<em>int</em>) &#8211; Select which db should be used for this connection</li>
+<li><strong>password</strong> (<em>str</em>) &#8211; Password used for authentication. If None, no authentication is done</li>
+<li><strong>encoding</strong> (<em>str</em>) &#8211; Convert result strings with this encoding. If None, no encoding is done.</li>
+<li><strong>conn_timeout</strong> (<em>float</em>) &#8211; Connect Timeout.</li>
+<li><strong>read_timeout</strong> (<em>float</em>) &#8211; Read Timeout.</li>
+<li><strong>sentinel</strong> (<em>bool</em>) &#8211; If True, authentication and database selection is skipped.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyredis.connection.Connection.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.connection.Connection.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close Client Connection.</p>
+<p>This closes the underlying socket, and mark the connection as closed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.connection.Connection.read">
+<tt class="descname">read</tt><big>(</big><em>close_on_timeout=True</em>, <em>raise_on_result_err=True</em><big>)</big><a class="headerlink" href="#pyredis.connection.Connection.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read result from the socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>close_on_timeout</strong> (<em>book</em>) &#8211; Close the connection after a read timeout</li>
+<li><strong>raise_on_result_err</strong> (<em>bool</em>) &#8211; Raise exception on protocol errors</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.connection.Connection.write">
+<tt class="descname">write</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.connection.Connection.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write commands to socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>str, int, float</em>) &#8211; Accepts a variable number of arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="client">
+<h2>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Client<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.Client">
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">Client</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#pyredis.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Client for Talking to Redis.</p>
+<dl class="docutils">
+<dt>Inherits the following Commmand classes:</dt>
+<dd><ul class="first last simple">
+<li>commands.Connection,</li>
+<li>commands.Hash,</li>
+<li>commands.HyperLogLog,</li>
+<li>commands.Key,</li>
+<li>commands.List,</li>
+<li>commands.Publish,</li>
+<li>commands.Scripting,</li>
+<li>commands.Set,</li>
+<li>commands.SSet,</li>
+<li>commands.String,</li>
+<li>commands.Transaction</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; pyredis.Client takes the same arguments as pyredis.connection.Connection.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pyredis.Client.bulk">
+<tt class="descname">bulk</tt><a class="headerlink" href="#pyredis.Client.bulk" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if bulk mode is enabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.Client.bulk_start">
+<tt class="descname">bulk_start</tt><big>(</big><em>bulk_size=5000</em>, <em>keep_results=True</em><big>)</big><a class="headerlink" href="#pyredis.Client.bulk_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable bulk mode</p>
+<p>Put the client into bulk mode. Instead of executing a command &amp; waiting for
+the reply, all commands are send to Redis without fetching the result.
+The results get fetched whenever $bulk_size commands have been executed,
+which will also resets the counter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bulk_size</strong> (<em>int</em>) &#8211; Number of commands to execute, before fetching results.</li>
+<li><strong>keep_results</strong> (<em>bool</em>) &#8211; If True, keep the results. The Results will be returned when calling bulk_stop.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.Client.bulk_stop">
+<tt class="descname">bulk_stop</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.Client.bulk_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop bulk mode.</p>
+<p>All outstanding results from previous commands get fetched.
+If bulk_start was called with keep_results=True, return a list with all
+results from the executed commands.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None, list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.Client.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.Client.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close client.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.Client.closed">
+<tt class="descname">closed</tt><a class="headerlink" href="#pyredis.Client.closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if client is closed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.Client.execute">
+<tt class="descname">execute</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.Client.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute arbitrary redis command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>list, int, float</em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="clusterclient">
+<h3>ClusterClient<a class="headerlink" href="#clusterclient" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.ClusterClient">
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">ClusterClient</tt><a class="headerlink" href="#pyredis.ClusterClient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="pubsubclient">
+<h3>PubSubClient<a class="headerlink" href="#pubsubclient" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.PubSubClient">
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">PubSubClient</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#pyredis.PubSubClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pub/Sub Client.</p>
+<p>Subscribe part of the Redis Pub/Sub System.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; pyredis.Client takes the same arguments as pyredis.connection.Connection.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyredis.PubSubClient.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.PubSubClient.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close Client</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.PubSubClient.closed">
+<tt class="descname">closed</tt><a class="headerlink" href="#pyredis.PubSubClient.closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if Client is closed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.PubSubClient.get">
+<tt class="descname">get</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.PubSubClient.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch published item from Redis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="sentinelclient">
+<h3>SentinelClient<a class="headerlink" href="#sentinelclient" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.SentinelClient">
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">SentinelClient</tt><big>(</big><em>sentinels</em><big>)</big><a class="headerlink" href="#pyredis.SentinelClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Redis Sentinel Client.</p>
+<dl class="method">
+<dt id="pyredis.SentinelClient.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.SentinelClient.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close Connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.SentinelClient.execute">
+<tt class="descname">execute</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.SentinelClient.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute sentinel command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>string, int, float</em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.SentinelClient.get_master">
+<tt class="descname">get_master</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#pyredis.SentinelClient.get_master" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Master Info.</p>
+<p>Return dictionary with master details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; Name of Redis service</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.SentinelClient.get_masters">
+<tt class="descname">get_masters</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.SentinelClient.get_masters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of masters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of dicts</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.SentinelClient.get_slaves">
+<tt class="descname">get_slaves</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#pyredis.SentinelClient.get_slaves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get slaves.</p>
+<p>Return a list of dictionaries, with slave details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; Name of Redis service</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.SentinelClient.next_sentinel">
+<tt class="descname">next_sentinel</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.SentinelClient.next_sentinel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch to the Next Sentinel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.SentinelClient.sentinels">
+<tt class="descname">sentinels</tt><a class="headerlink" href="#pyredis.SentinelClient.sentinels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured sentinels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">deque</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>Connection<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Connection">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Connection</tt><a class="headerlink" href="#pyredis.commands.Connection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Connection.echo">
+<tt class="descname">echo</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Connection.echo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ECHO Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Connection.ping">
+<tt class="descname">ping</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.commands.Connection.ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PING Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result,exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hash">
+<h3>Hash<a class="headerlink" href="#hash" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Hash">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Hash</tt><a class="headerlink" href="#pyredis.commands.Hash" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Hash.hdel">
+<tt class="descname">hdel</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hdel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HDEL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hexists">
+<tt class="descname">hexists</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hexists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HEXISTS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hget">
+<tt class="descname">hget</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HGET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hgetall">
+<tt class="descname">hgetall</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hgetall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HGETALL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hincrby">
+<tt class="descname">hincrby</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hincrby" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HINCRBY Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hincrbyfloat">
+<tt class="descname">hincrbyfloat</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hincrbyfloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HINCRBYFLOAT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hkeys">
+<tt class="descname">hkeys</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HKEYS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hlen">
+<tt class="descname">hlen</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hlen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HLEN Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hmget">
+<tt class="descname">hmget</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hmget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HMGET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hmset">
+<tt class="descname">hmset</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hmset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HMSET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hscan">
+<tt class="descname">hscan</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hscan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HSCAN Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hset">
+<tt class="descname">hset</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HSET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hsetnx">
+<tt class="descname">hsetnx</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hsetnx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HSETNX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Hash.hvals">
+<tt class="descname">hvals</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Hash.hvals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute HVALS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hyperloglog">
+<h3>HyperLogLog<a class="headerlink" href="#hyperloglog" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.HyperLogLog">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">HyperLogLog</tt><a class="headerlink" href="#pyredis.commands.HyperLogLog" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.HyperLogLog.pfadd">
+<tt class="descname">pfadd</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.HyperLogLog.pfadd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PFADD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.HyperLogLog.pfcount">
+<tt class="descname">pfcount</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.HyperLogLog.pfcount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PFCOUNT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.HyperLogLog.pfmerge">
+<tt class="descname">pfmerge</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.HyperLogLog.pfmerge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PFMERGE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="key">
+<h3>Key<a class="headerlink" href="#key" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Key">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Key</tt><a class="headerlink" href="#pyredis.commands.Key" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Key.delete">
+<tt class="descname">delete</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute DEL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.dump">
+<tt class="descname">dump</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute DUMP Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.exists">
+<tt class="descname">exists</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute EXISTS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.expire">
+<tt class="descname">expire</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.expire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute EXPIRE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.expireat">
+<tt class="descname">expireat</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.expireat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute EXPIREAT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.keys">
+<tt class="descname">keys</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute KEYS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.migrate">
+<tt class="descname">migrate</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.migrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute MIGRATE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.move">
+<tt class="descname">move</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute MOVE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.object">
+<tt class="descname">object</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute OBJECT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.persist">
+<tt class="descname">persist</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.persist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PERSIST Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.pexpire">
+<tt class="descname">pexpire</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.pexpire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PEXPIRE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.pexpireat">
+<tt class="descname">pexpireat</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.pexpireat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PEXPIREAT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.pttl">
+<tt class="descname">pttl</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.pttl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PTTL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.randomkey">
+<tt class="descname">randomkey</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.randomkey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RANDOMKEY Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.rename">
+<tt class="descname">rename</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RENAME Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.renamenx">
+<tt class="descname">renamenx</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.renamenx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RENAMENX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.restore">
+<tt class="descname">restore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RESTORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.scan">
+<tt class="descname">scan</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SCAN Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.sort">
+<tt class="descname">sort</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SORT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.ttl">
+<tt class="descname">ttl</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.ttl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute TTL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Key.type">
+<tt class="descname">type</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute TYPE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="list">
+<h3>List<a class="headerlink" href="#list" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.List">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">List</tt><a class="headerlink" href="#pyredis.commands.List" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.List.blpop">
+<tt class="descname">blpop</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.blpop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute BLPOP Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.brpop">
+<tt class="descname">brpop</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.brpop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute BRPOP Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.brpoplpush">
+<tt class="descname">brpoplpush</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.brpoplpush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute BRPOPPUSH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.lindex">
+<tt class="descname">lindex</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.lindex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LINDEX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.linsert">
+<tt class="descname">linsert</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.linsert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LINSERT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.llen">
+<tt class="descname">llen</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.llen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LLEN Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.lpop">
+<tt class="descname">lpop</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.lpop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LPOP Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.lpush">
+<tt class="descname">lpush</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.lpush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LPUSH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.lpushx">
+<tt class="descname">lpushx</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.lpushx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LPUSHX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.lrange">
+<tt class="descname">lrange</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.lrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LRANGE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.lrem">
+<tt class="descname">lrem</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.lrem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LREM Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.lset">
+<tt class="descname">lset</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.lset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LSET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.ltrim">
+<tt class="descname">ltrim</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.ltrim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute LTRIM Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.rpop">
+<tt class="descname">rpop</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.rpop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RPOP Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.rpoplpush">
+<tt class="descname">rpoplpush</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.rpoplpush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RPOPLPUSH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.rpush">
+<tt class="descname">rpush</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.rpush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RPUSH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.List.rpushx">
+<tt class="descname">rpushx</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.List.rpushx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute RPUSHX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="publish">
+<h3>Publish<a class="headerlink" href="#publish" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Publish">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Publish</tt><a class="headerlink" href="#pyredis.commands.Publish" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Publish.publish">
+<tt class="descname">publish</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Publish.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PUBLISH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="scripting">
+<h3>Scripting<a class="headerlink" href="#scripting" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Scripting">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Scripting</tt><a class="headerlink" href="#pyredis.commands.Scripting" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Scripting.eval">
+<tt class="descname">eval</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute EVAL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Scripting.evalsha">
+<tt class="descname">evalsha</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.evalsha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute EVALSHA Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Scripting.script_exists">
+<tt class="descname">script_exists</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SCRIPT EXISTS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Scripting.script_flush">
+<tt class="descname">script_flush</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SCRIPT FLUSH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Scripting.script_kill">
+<tt class="descname">script_kill</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_kill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SCRIPT KILL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Scripting.script_load">
+<tt class="descname">script_load</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SCRIPT LOAD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="set">
+<h3>Set<a class="headerlink" href="#set" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Set">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Set</tt><a class="headerlink" href="#pyredis.commands.Set" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Set.sadd">
+<tt class="descname">sadd</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sadd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SADD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.scard">
+<tt class="descname">scard</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.scard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SCARD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sdiff">
+<tt class="descname">sdiff</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sdiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SDIFF Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sdiffstore">
+<tt class="descname">sdiffstore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sdiffstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SDIFFSTORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sinter">
+<tt class="descname">sinter</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sinter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SINTER Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sinterstore">
+<tt class="descname">sinterstore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sinterstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SINTERSTORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sismember">
+<tt class="descname">sismember</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sismember" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SISMEMBER Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.smembers">
+<tt class="descname">smembers</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.smembers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SMEMBERS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.smove">
+<tt class="descname">smove</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.smove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SMOVE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.spop">
+<tt class="descname">spop</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.spop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SPOP Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.srandmember">
+<tt class="descname">srandmember</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.srandmember" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SRANDMEMBER Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.srem">
+<tt class="descname">srem</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.srem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SREM Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sscan">
+<tt class="descname">sscan</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sscan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SSCAN Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sunion">
+<tt class="descname">sunion</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sunion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SUNION Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Set.sunoinstore">
+<tt class="descname">sunoinstore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Set.sunoinstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SUNIONSTORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="sset">
+<h3>SSet<a class="headerlink" href="#sset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.SSet">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">SSet</tt><a class="headerlink" href="#pyredis.commands.SSet" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.SSet.zadd">
+<tt class="descname">zadd</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zadd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZADD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zcard">
+<tt class="descname">zcard</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zcard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZCARD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zcount">
+<tt class="descname">zcount</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zcount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZCOUNT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zincrby">
+<tt class="descname">zincrby</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zincrby" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZINCRBY Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zinterstore">
+<tt class="descname">zinterstore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zinterstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZINTERSTORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zlexcount">
+<tt class="descname">zlexcount</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zlexcount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZLEXCOUNT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrange">
+<tt class="descname">zrange</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZRANGE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrangebylex">
+<tt class="descname">zrangebylex</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrangebylex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZRANGEBYLEX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrangebyscore">
+<tt class="descname">zrangebyscore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrangebyscore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZRANGEBYSCORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrank">
+<tt class="descname">zrank</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZRANK Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrem">
+<tt class="descname">zrem</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZREM Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zremrangebylex">
+<tt class="descname">zremrangebylex</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zremrangebylex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZREMRANGEBYLEX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zremrangebyrank">
+<tt class="descname">zremrangebyrank</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zremrangebyrank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZREMRANGEBYRANK Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zremrangebyscrore">
+<tt class="descname">zremrangebyscrore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zremrangebyscrore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZREMRANGEBYSCORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrevrange">
+<tt class="descname">zrevrange</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrevrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZREVRANGE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrevrangebyscore">
+<tt class="descname">zrevrangebyscore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrevrangebyscore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZREVRANGEBYSCORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zrevrank">
+<tt class="descname">zrevrank</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zrevrank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZREVRANK Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zscan">
+<tt class="descname">zscan</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zscan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZSCAN Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zscore">
+<tt class="descname">zscore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zscore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZSCORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.SSet.zunionstore">
+<tt class="descname">zunionstore</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.SSet.zunionstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute ZUNIONSTORE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="string">
+<h3>String<a class="headerlink" href="#string" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.String">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">String</tt><a class="headerlink" href="#pyredis.commands.String" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.String.append">
+<tt class="descname">append</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute APPEND Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.bitcount">
+<tt class="descname">bitcount</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.bitcount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute BITCOUNT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.bitop">
+<tt class="descname">bitop</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.bitop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute BITOP Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.bitpos">
+<tt class="descname">bitpos</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.bitpos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute BITPOS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.decr">
+<tt class="descname">decr</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.decr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute DECR Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.decrby">
+<tt class="descname">decrby</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.decrby" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute DECRBY Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.get">
+<tt class="descname">get</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute GET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.getbit">
+<tt class="descname">getbit</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.getbit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute GETBIT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.getrange">
+<tt class="descname">getrange</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.getrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute GETRANGE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.getset">
+<tt class="descname">getset</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.getset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute GETSET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.incr">
+<tt class="descname">incr</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.incr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute INCR Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.incrby">
+<tt class="descname">incrby</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.incrby" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute INCRBY Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.incrbyfloat">
+<tt class="descname">incrbyfloat</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.incrbyfloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute INCRBYFLOAT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.mget">
+<tt class="descname">mget</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.mget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute MGET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.mset">
+<tt class="descname">mset</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.mset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute MSET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.msetnx">
+<tt class="descname">msetnx</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.msetnx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute MSETNX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.psetex">
+<tt class="descname">psetex</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.psetex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PSETEX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.set">
+<tt class="descname">set</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SET Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.setbit">
+<tt class="descname">setbit</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.setbit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SETBIT Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.setex">
+<tt class="descname">setex</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.setex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SETEX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.setnx">
+<tt class="descname">setnx</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.setnx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SETNX Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.setrange">
+<tt class="descname">setrange</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.setrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SETRANGE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.String.strlen">
+<tt class="descname">strlen</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.String.strlen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute STRLEN Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="subscribe">
+<h3>Subscribe<a class="headerlink" href="#subscribe" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Subscribe">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Subscribe</tt><a class="headerlink" href="#pyredis.commands.Subscribe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Subscribe.psubscribe">
+<tt class="descname">psubscribe</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Subscribe.psubscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PSUBSCRIBE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Subscribe.punsubscribe">
+<tt class="descname">punsubscribe</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Subscribe.punsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute PUNSUBSCRIBE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Subscribe.subscribe">
+<tt class="descname">subscribe</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Subscribe.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute SUBSCRIBE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Subscribe.unsubscribe">
+<tt class="descname">unsubscribe</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Subscribe.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute UNSUBSCRIBE Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="transaction">
+<h3>Transaction<a class="headerlink" href="#transaction" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.commands.Transaction">
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Transaction</tt><a class="headerlink" href="#pyredis.commands.Transaction" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyredis.commands.Transaction.discard">
+<tt class="descname">discard</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.discard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute DISCARD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Transaction.exec">
+<tt class="descname">exec</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.exec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute EXEC Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Transaction.multi">
+<tt class="descname">multi</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute MULTI Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Transaction.unwatch">
+<tt class="descname">unwatch</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.unwatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute UNWATCH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.commands.Transaction.watch">
+<tt class="descname">watch</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.watch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute WATCH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="pool">
+<h2>Pool<a class="headerlink" href="#pool" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API Documentation</a><ul>
+<li><a class="reference internal" href="#connection">Connection</a></li>
+<li><a class="reference internal" href="#client">Client</a><ul>
+<li><a class="reference internal" href="#id1">Client</a></li>
+<li><a class="reference internal" href="#clusterclient">ClusterClient</a></li>
+<li><a class="reference internal" href="#pubsubclient">PubSubClient</a></li>
+<li><a class="reference internal" href="#sentinelclient">SentinelClient</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#commands">Commands</a><ul>
+<li><a class="reference internal" href="#id2">Connection</a></li>
+<li><a class="reference internal" href="#hash">Hash</a></li>
+<li><a class="reference internal" href="#hyperloglog">HyperLogLog</a></li>
+<li><a class="reference internal" href="#key">Key</a></li>
+<li><a class="reference internal" href="#list">List</a></li>
+<li><a class="reference internal" href="#publish">Publish</a></li>
+<li><a class="reference internal" href="#scripting">Scripting</a></li>
+<li><a class="reference internal" href="#set">Set</a></li>
+<li><a class="reference internal" href="#sset">SSet</a></li>
+<li><a class="reference internal" href="#string">String</a></li>
+<li><a class="reference internal" href="#subscribe">Subscribe</a></li>
+<li><a class="reference internal" href="#transaction">Transaction</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pool">Pool</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="example.html"
+                        title="previous chapter">Usage Example</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pyredis.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="example.html" title="Usage Example"
+             >previous</a> |</li>
+        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Stephan Schultchen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
