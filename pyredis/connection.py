@@ -14,22 +14,22 @@ __all__ = [
 class Connection(object):
     """ Low level client for talking to a Redis Server.
 
-    This class is should not be used directly used to talk to a Redis server
+    This class is should not be used directly to talk to a Redis server,
     unless you know what you are doing. In most cases it should be
     sufficient to use one of the Client classes, or one of the Connection Pools.
 
     :param host:
-        Host IP or Name to connect to.
-        Can only be set when unix_sock is None.
+        Host IP or Name to connect,
+        can only be set when unix_sock is None.
     :type host: str
 
     :param port:
-        Port to connect to, only used when host is also set
+        Port to connect, only used when host is also set.
     :type port: int
 
     :param unix_sock:
-        Unix Socket to connect to
-        Can only be set when host is None.
+        Unix Socket to connect,
+        can only be set when host is None.
     :type unix_sock: str
 
     :param database:

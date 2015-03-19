@@ -9,7 +9,36 @@ from pyredis.exceptions import *
 class BasePool(object):
     """ Base Class for all other pools.
 
-    Other Pools Subclass from this Pool
+    All other pools inherit from this base class.
+    This class itself, cannot be used directly.
+
+    :param database:
+        Select which db should be used for this pool
+    :type database: int
+
+    :param password:
+        Password used for authentication. If None, no authentication is done
+    :type password: str
+
+    :param encoding:
+        Convert result strings with this encoding. If None, no encoding is done.
+    :type encoding: str
+
+    :param conn_timeout:
+        Connect Timeout.
+    :type conn_timeout: float
+
+    :param read_timeout:
+        Read Timeout.
+    :type read_timeout: float
+
+    :param pool_size:
+        Upper limit of connections this pool can handle.
+    :type pool_size: int
+
+    :param lock:
+        Class implementing a Lock.
+    :type lock: lock object, defaults to threading.Lock
 
     """
     def __init__(
@@ -34,26 +63,51 @@ class BasePool(object):
 
     @property
     def conn_timeout(self):
+        """ Return configured connection timeout
+
+        :return: float
+        """
         return self._conn_timeout
 
     @property
     def read_timeout(self):
+        """ Return configured read timeout
+
+        :return: float
+        """
         return self._read_timeout
 
     @property
     def database(self):
+        """ Return configured database.
+
+        :return: int
+        """
         return self._database
 
     @property
     def password(self):
+        """ Return configured password for this pool.
+
+        :return: str, None
+        """
         return self._password
 
     @property
     def encoding(self):
+        """ Return configured encoding
+
+        :return: str, None
+        """
         return self._encoding
 
     @property
     def pool_size(self):
+        """ Return, or adjust the current pool size.
+        Shrinking the pool is currently not implemented.
+
+        :return: int, None
+        """
         return self._pool_size
 
     @pool_size.setter
@@ -68,6 +122,10 @@ class BasePool(object):
         raise NotImplemented
 
     def acquire(self):
+        """ Acquire a client connection from the pool.
+
+        :return: redis.Client, exception
+        """
         try:
             self._lock.acquire()
             client = self._pool_free.pop()
@@ -83,6 +141,12 @@ class BasePool(object):
         return client
 
     def release(self, conn):
+        """ Return a client connection to the pool.
+
+        :param conn:
+            redis.Client instance, managed by this pool.
+        :return: None
+        """
         try:
             self._lock.acquire()
             self._pool_used.remove(conn)
@@ -100,6 +164,25 @@ class BasePool(object):
 
 
 class Pool(BasePool):
+    """ Pool for straight connections to Redis
+
+    Inherits all the arguments, methods and attributes from BasePool.
+
+    :param host:
+        Host IP or Name to connect,
+        can only be set when unix_sock is None.
+    :type host: str
+
+    :param port:
+        Port to connect, only used when host is also set.
+    :type port: int
+
+    :param unix_sock:
+        Unix Socket to connect,
+        can only be set when host is None.
+    :type unix_sock: str
+
+    """
     def __init__(self, host=None, port=6379, unix_sock=None, **kwargs):
         if not bool(host) != bool(unix_sock):
             raise PyRedisError("Ether host or unix_sock has to be provided")
@@ -110,14 +193,26 @@ class Pool(BasePool):
 
     @property
     def host(self):
+        """ Return configured host.
+
+        :return: str, None
+        """
         return self._host
 
     @property
     def port(self):
+        """ Return configured port.
+
+        :return: int
+        """
         return self._port
 
     @property
     def unix_sock(self):
+        """ Return configured Unix socket.
+
+        :return: str, None
+        """
         return self._unix_sock
 
     def _connect(self):
@@ -134,6 +229,26 @@ class Pool(BasePool):
 
 
 class SentinelPool(BasePool):
+    """ Sentinel backed Pool.
+
+    Inherits all the arguments, methods and attributes from BasePool.
+
+    :param sentinels:
+        Accepts a list of sentinels in this form: [('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)]
+    :type sentinels: list
+
+    :param name:
+        Name of the cluster managed by sentinel, that this pool should manage.
+    :type name: str
+
+    :param slave_ok:
+        Defaults to False. If True, this pool will return connections to slave instances.
+    type slave_ok: bool
+
+    :param retries:
+        In case a sentinel delivers stale data, how many other sentinels should be tried.
+    :type retries: int
+    """
     def __init__(self, sentinels, name, slave_ok=False, retries=3, **kwargs):
         super().__init__(**kwargs)
         self._sentinel = SentinelClient(sentinels=sentinels)
@@ -144,18 +259,34 @@ class SentinelPool(BasePool):
 
     @property
     def slave_ok(self):
+        """ True if this pool return slave connections
+
+        :return: bool
+        """
         return self._slave_ok
 
     @property
     def name(self):
+        """ Name of the configured Sentinel managed cluster.
+
+        :return: str
+        """
         return self._name
 
     @property
     def retries(self):
+        """ Number of retries with in case of stale sentinel.
+
+        :return: int
+        """
         return self._retries
 
     @property
     def sentinels(self):
+        """ Deque with configured sentinels.
+
+        :return: deque
+        """
         return self._sentinel.sentinels
 
     def _connect(self):

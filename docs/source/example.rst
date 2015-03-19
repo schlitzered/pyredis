@@ -11,20 +11,21 @@ Simple Client Usage
     client.ping()
 
 
-Bulk Requests
--------------
+Bulk Mode
+---------
 
-Bulk Requests can be used to import large amounts of data in
+Bulk Mode can be used to import large amounts of data in
 a short time. With bulk mode enabled sending requests and
-fetching results is separated from each other. This save some
-network round trips.
+fetching results is separated from each other. Which will
+save many network round trips, improving query performance.
 
 All executed commands will return None.
 
-There is a threshold, which defaults to
-5000 requests, after which the results of the previous requests
-are fetched into a list. This can be disabled by calling
-bulk_start with the parameter keep_results=False.
+There is a threshold, which defaults to 5000 requests,
+after which the results of the previous requests are
+fetched into a list. If you are not interested in the
+results, this can be disabled by calling bulk_start
+with the parameter keep_results=False.
 
 Fetching results, when the threshold is reached is a transparent
 operation. The client will only notice that the execution

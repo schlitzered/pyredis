@@ -111,3 +111,21 @@ Transaction
 
 Pool
 ====
+
+BasePool
+--------
+
+.. autoclass:: pyredis.pool.BasePool
+    :members:
+
+Pool
+----
+
+.. autoclass:: pyredis.Pool
+   :members:
+
+SentinelPool
+------------
+
+.. autoclass:: pyredis.SentinelPool
+   :members:

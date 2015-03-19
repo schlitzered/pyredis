@@ -159,7 +159,7 @@ class PubSubClient(commands.Subscribe):
     Subscribe part of the Redis Pub/Sub System.
 
     :param kwargs:
-        pyredis.Client takes the same arguments as pyredis.connection.Connection.
+        pyredis.PubSubClient takes the same arguments as pyredis.connection.Connection.
     """
     def __init__(self, **kwargs):
         self._conn = Connection(**kwargs)
@@ -190,6 +190,9 @@ class PubSubClient(commands.Subscribe):
 class SentinelClient(object):
     """ Redis Sentinel Client.
 
+    :param sentinels:
+        Accepts a list of sentinels in this form: [('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)]
+    :type sentinels: list
     """
     def __init__(self, sentinels):
         self._conn = None

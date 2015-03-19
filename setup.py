@@ -3,9 +3,9 @@ from setuptools import setup
 import pyredis
 
 setup(
-    name='pyredis',
+    name='python_redis',
     version='0.0.1',
-    description='Implementation of PEP 3143, a unix daemon',
+    description='Redis Client',
     long_description=pyredis.__doc__,
     packages=['pyredis'],
     url='https://github.com/schlitzered/pyredis',
@@ -15,7 +15,6 @@ setup(
     test_suite='test',
     platforms='posix',
     classifiers=[
-            'Development Status :: 3 - Production/Alpha',
             'License :: OSI Approved :: MIT License',
             'Programming Language :: Python :: 3'
     ],
