@@ -143,6 +143,10 @@ class ReaderTest(TestCase):
         self.reader.feed(b'$0\r\n\r\n')
         self.assertEquals(b'', self.reply())
 
+    def test_NULL_bulk_string(self):
+        self.reader.feed(b'$-1\r\n')
+        self.assertEquals(None, self.reply())
+
     def test_bulk_string(self):
         self.reader.feed(b'$5\r\nhello\r\n')
         self.assertEquals(b'hello', self.reply())

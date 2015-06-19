@@ -116,7 +116,11 @@ class ReplyParser(object):
     def parse_bulk(self):
         if not self._len:
             bulk_len = self.readline()
-            if bulk_len:
+            if bulk_len == b'-1':
+                self.complete = True
+                self.result = None
+                return True
+            elif bulk_len:
                 self._len = int(bulk_len) + 2
             else:
                 return
