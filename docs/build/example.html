@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Usage Example &mdash; pyredis 0.0.1 documentation</title>
+    <title>Usage Example &mdash; pyredis 0.0.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1',
+        VERSION:     '0.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyredis 0.0.1 documentation" href="index.html" />
+    <link rel="top" title="pyredis 0.0.2 documentation" href="index.html" />
     <link rel="next" title="API Documentation" href="pyredis.html" />
     <link rel="prev" title="Introduction" href="intro.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyredis 0.0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -51,12 +51,99 @@
             
   <div class="section" id="usage-example">
 <h1>Usage Example<a class="headerlink" href="#usage-example" title="Permalink to this headline">¶</a></h1>
-<p>some description:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyredis</span> <span class="kn">import</span> <span class="n">Client</span>
+<div class="section" id="simple-client-usage">
+<h2>Simple Client Usage<a class="headerlink" href="#simple-client-usage" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyredis</span> <span class="kn">import</span> <span class="n">Client</span>
 
-<span class="n">client</span> <span class="o">=</span> <span class="n">Clinet</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">localhost</span><span class="p">)</span>
-<span class="n">client</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="bulk-mode">
+<h2>Bulk Mode<a class="headerlink" href="#bulk-mode" title="Permalink to this headline">¶</a></h2>
+<p>Bulk Mode can be used to import large amounts of data in
+a short time. With bulk mode enabled sending requests and
+fetching results is separated from each other. Which will
+save many network round trips, improving query performance.</p>
+<p>All executed commands will return None.</p>
+<p>There is a threshold, which defaults to 5000 requests,
+after which the results of the previous requests are
+fetched into a list. If you are not interested in the
+results, this can be disabled by calling bulk_start
+with the parameter keep_results=False.</p>
+<p>Fetching results, when the threshold is reached is a transparent
+operation. The client will only notice that the execution
+of the the request triggering the threshold will take a little longer.</p>
+<p>Calling bulk_stop() will fetch all remaining results, and return a list
+with fetched results. This list can also contain exceptions from failed
+commands.</p>
+<div class="code python highlight-python"><div class="highlight"><pre>from pyredis import Client
+
+client = Client(host=&quot;localhost&quot;)
+client.bulk_start()
+client.set(&#39;key1&#39;, &#39;value1)
+client.set(&#39;key1&#39;, &#39;value1)
+client.set(&#39;key1&#39;, &#39;value1)
+client.bulk_stop()
+[b&#39;OK&#39;, b&#39;OK&#39;, b&#39;OK&#39;]
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-a-connection-pool">
+<h2>Using a Connection Pool<a class="headerlink" href="#using-a-connection-pool" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyredis</span> <span class="kn">import</span> <span class="n">Pool</span>
+
+<span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span><span class="p">)</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">aquire</span><span class="p">()</span>
+<span class="n">client</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+<span class="n">b</span><span class="s">&#39;PONG&#39;</span>
+<span class="n">pool</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-a-cluster-connection-pool">
+<h2>Using a Cluster Connection Pool<a class="headerlink" href="#using-a-cluster-connection-pool" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyredis</span> <span class="kn">import</span> <span class="n">ClusterPool</span>
+
+<span class="n">pool</span> <span class="o">=</span> <span class="n">ClusterPool</span><span class="p">(</span><span class="n">seeds</span><span class="o">=</span><span class="p">[(</span><span class="s">&#39;seed1&#39;</span><span class="p">,</span> <span class="mi">6379</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;seed2&#39;</span><span class="p">,</span> <span class="mi">6379</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;seed3&#39;</span><span class="p">,</span> <span class="mi">6379</span><span class="p">)])</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">aquire</span><span class="p">()</span>
+<span class="n">client</span><span class="o">.</span><span class="n">ping</span><span class="p">(</span><span class="n">shard_key</span><span class="o">=</span><span class="s">&#39;test&#39;</span><span class="p">)</span>
+<span class="n">b</span><span class="s">&#39;PONG&#39;</span>
+<span class="n">pool</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-a-sentinel-backed-connection-pool">
+<h2>Using a Sentinel backed Connection Pool<a class="headerlink" href="#using-a-sentinel-backed-connection-pool" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyredis</span> <span class="kn">import</span> <span class="n">SentinelPool</span>
+
+<span class="n">pool</span> <span class="o">=</span> <span class="n">SentinelPool</span><span class="p">(</span><span class="n">sentinels</span><span class="o">=</span><span class="p">[(</span><span class="s">&#39;sentinel1&#39;</span><span class="p">,</span> <span class="mi">26379</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;sentinel2&#39;</span><span class="p">,</span> <span class="mi">26379</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;sentinel3&#39;</span><span class="p">,</span> <span class="mi">26379</span><span class="p">)])</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">aquire</span><span class="p">()</span>
+<span class="n">client</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+<span class="n">b</span><span class="s">&#39;PONG&#39;</span>
+<span class="n">pool</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="publish-subscribe">
+<h2>Publish Subscribe<a class="headerlink" href="#publish-subscribe" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyredis</span> <span class="kn">import</span> <span class="n">Client</span><span class="p">,</span> <span class="n">PubSubClient</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">subscribe</span> <span class="o">=</span> <span class="n">PubSubClient</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">)</span>
+
+<span class="n">subscribe</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s">&#39;/blub&#39;</span><span class="p">)</span>
+<span class="n">subscribe</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="p">[</span><span class="n">b</span><span class="s">&#39;subscribe&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;/blub&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s">&#39;/blub&#39;</span><span class="p">,</span> <span class="s">&#39;test&#39;</span><span class="p">)</span>
+<span class="mi">1</span>
+
+<span class="n">subscribe</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="p">[</span><span class="n">b</span><span class="s">&#39;message&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;/blub&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;test&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -66,6 +153,19 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Usage Example</a><ul>
+<li><a class="reference internal" href="#simple-client-usage">Simple Client Usage</a></li>
+<li><a class="reference internal" href="#bulk-mode">Bulk Mode</a></li>
+<li><a class="reference internal" href="#using-a-connection-pool">Using a Connection Pool</a></li>
+<li><a class="reference internal" href="#using-a-cluster-connection-pool">Using a Cluster Connection Pool</a></li>
+<li><a class="reference internal" href="#using-a-sentinel-backed-connection-pool">Using a Sentinel backed Connection Pool</a></li>
+<li><a class="reference internal" href="#publish-subscribe">Publish Subscribe</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="intro.html"
                         title="previous chapter">Introduction</a></p>
@@ -106,7 +206,7 @@
         <li class="right" >
           <a href="intro.html" title="Introduction"
              >previous</a> |</li>
-        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyredis 0.0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

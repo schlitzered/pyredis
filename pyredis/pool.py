@@ -2,8 +2,9 @@ __author__ = 'schlitzer'
 
 from random import shuffle
 import threading
-from pyredis.client import Client, SentinelClient
+from pyredis.client import Client, ClusterClient, SentinelClient
 from pyredis.exceptions import *
+from pyredis.helper import ClusterMap
 
 
 class BasePool(object):
@@ -38,7 +39,7 @@ class BasePool(object):
 
     :param lock:
         Class implementing a Lock.
-    :type lock: lock object, defaults to threading.Lock
+    :type lock: _lock object, defaults to threading.Lock
 
     """
     def __init__(
@@ -163,6 +164,50 @@ class BasePool(object):
             self._lock.release()
 
 
+class ClusterPool(BasePool):
+    """ Redis Cluster Pool.
+
+    Inherits all the arguments, methods and attributes from BasePool.
+
+    :param seeds:
+        Accepts a list of seed nodes in this form: [('host1', 6379), ('host2', 6379), ('host3', 6379)]
+    :type sentinels: list
+
+    :param slave_ok:
+        Defaults to False. If True, this pool will return connections to slave instances.
+    :type slave_ok: bool
+
+    :param retries:
+        In case there is a chunk move ongoing, while executing a command, how many times should
+        we try to find the right node, before giving up.
+    :type retries: int
+    """
+
+    def __init__(self, seeds, slave_ok=False, **kwargs):
+        super().__init__(**kwargs)
+        self._map = ClusterMap(seeds=seeds)
+        self._slave_ok = slave_ok
+
+    @property
+    def slave_ok(self):
+        """ True if this pool will return slave connections
+
+        :return: bool
+        """
+        return self._slave_ok
+
+    def _connect(self):
+        return ClusterClient(
+            database=self.database,
+            password=self.password,
+            encoding=self.encoding,
+            slave_ok=self.slave_ok,
+            conn_timeout=self.conn_timeout,
+            read_timeout=self.read_timeout,
+            cluster_map=self._map
+        )
+
+
 class Pool(BasePool):
     """ Pool for straight connections to Redis
 
@@ -243,7 +288,7 @@ class SentinelPool(BasePool):
 
     :param slave_ok:
         Defaults to False. If True, this pool will return connections to slave instances.
-    type slave_ok: bool
+    :type slave_ok: bool
 
     :param retries:
         In case a sentinel delivers stale data, how many other sentinels should be tried.
@@ -275,7 +320,7 @@ class SentinelPool(BasePool):
 
     @property
     def retries(self):
-        """ Number of retries with in case of stale sentinel.
+        """ Number of retries in case of stale sentinel.
 
         :return: int
         """

@@ -2,9 +2,9 @@ from pyredis.exceptions import *
 from pyredis.protocol import writer
 import socket
 try:
-    from hiredis import Reader, ProtocolError, ReplyError
+    from hiredis import Reader
 except ImportError:
-    from pyredis.protocol import Reader, ProtocolError, ReplyError
+    from pyredis.protocol import Reader
 
 __all__ = [
     'Connection'

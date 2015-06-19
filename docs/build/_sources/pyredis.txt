@@ -34,6 +34,33 @@ SentinelClient
 .. autoclass:: pyredis.SentinelClient
     :members:
 
+Pool
+====
+
+BasePool
+--------
+
+.. autoclass:: pyredis.pool.BasePool
+    :members:
+
+ClusterPool
+-----------
+
+.. autoclass:: pyredis.ClusterPool
+    :members:
+
+Pool
+----
+
+.. autoclass:: pyredis.Pool
+    :members:
+
+SentinelPool
+------------
+
+.. autoclass:: pyredis.SentinelPool
+    :members:
+
 Commands
 ========
 
@@ -83,31 +110,34 @@ Set
 ---
 
 .. autoclass:: pyredis.commands.Set
-   :members:
+    :members:
 
 SSet
 ----
 
 .. autoclass:: pyredis.commands.SSet
-   :members:
+    :members:
 
 String
 ------
 
 .. autoclass:: pyredis.commands.String
-   :members:
+    :members:
 
 Subscribe
 ---------
 
 .. autoclass:: pyredis.commands.Subscribe
-   :members:
+    :members:
 
 Transaction
 -----------
 
 .. autoclass:: pyredis.commands.Transaction
-   :members:
+    :members:
 
-Pool
-====
+Scripting
+---------
+
+.. autoclass:: pyredis.commands.Scripting
+    :members:

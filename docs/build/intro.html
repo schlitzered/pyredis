@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Introduction &mdash; pyredis 0.0.1 documentation</title>
+    <title>Introduction &mdash; pyredis 0.0.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1',
+        VERSION:     '0.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyredis 0.0.1 documentation" href="index.html" />
+    <link rel="top" title="pyredis 0.0.2 documentation" href="index.html" />
     <link rel="next" title="Usage Example" href="example.html" />
     <link rel="prev" title="Welcome to pyredis’s documentation!" href="index.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to pyredis’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyredis 0.0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -51,10 +51,46 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>Redis Client implementation for Python 3 only (currently)</p>
-<div class="section" id="differences">
-<h2>Differences<a class="headerlink" href="#differences" title="Permalink to this headline">¶</a></h2>
-<p>Blarg!!!</p>
+<p>Redis Client implementation for Python. The Client only supports Python 3 for the moment.
+If there is enough interest, i will make it work with Python 2.</p>
+<dl class="docutils">
+<dt>Currently implemented Features:</dt>
+<dd><ul class="first last simple">
+<li>Base Redis Client</li>
+<li>Publish Subscribe Client</li>
+<li>Sentinel Client</li>
+<li>Connection Pool</li>
+<li>Sentinel Backed Connection Pool</li>
+<li>Client &amp; Pool for Redis Cluster</li>
+<li>Bulk Insert Mode ( Not supported with Redis Cluster )</li>
+</ul>
+</dd>
+<dt>Planned Features:</dt>
+<dd><ul class="first last simple">
+<li>Python 2 support ( If there is enough interest )</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<p>pyredis can be installed via pip as follows:</p>
+<div class="code highlight-python"><div class="highlight"><pre>pip install pyredis
+</pre></div>
+</div>
+</div>
+<div class="section" id="author">
+<h2>Author<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h2>
+<p>Stephan Schultchen &lt;<a class="reference external" href="mailto:stephan&#46;schultchen&#37;&#52;&#48;gmail&#46;com">stephan<span>&#46;</span>schultchen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>Unless stated otherwise on-file pyredis uses the MIT license,
+check LICENSE file.</p>
+</div>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;d like to contribute, fork the project, make a patch and send a pull
+request.</p>
 </div>
 </div>
 
@@ -67,7 +103,10 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Introduction</a><ul>
-<li><a class="reference internal" href="#differences">Differences</a></li>
+<li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#author">Author</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
 </ul>
 </li>
 </ul>
@@ -112,7 +151,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to pyredis’s documentation!"
              >previous</a> |</li>
-        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyredis 0.0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

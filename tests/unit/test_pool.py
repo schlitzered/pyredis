@@ -132,6 +132,48 @@ class TestBasePoolUnit(TestCase):
         conn_release.close.assert_called_with()
 
 
+class TestClusterPoolUnit(TestCase):
+    def setUp(self):
+        client_patcher = patch('pyredis.pool.ClusterClient', autospeck=True)
+        self.client_mock = client_patcher.start()
+
+        self.client_mock_inst = Mock()
+        self.client_mock.return_value = self.client_mock_inst
+
+        map_patcher = patch('pyredis.pool.ClusterMap', autospeck=True)
+        self.map_mock = map_patcher.start()
+
+        self.map_mock_inst = Mock()
+        self.map_mock.return_value = self.map_mock_inst
+
+        self.addCleanup(patch.stopall)
+
+        self.pool = pyredis.pool.ClusterPool(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)])
+
+    def test___init__(self):
+        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)])
+        self.assertEqual(self.pool._map, self.map_mock_inst)
+        self.assertFalse(self.pool.slave_ok)
+
+    def test___init__slave_ok_true(self):
+        self.pool = pyredis.pool.ClusterPool(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)], slave_ok=True)
+        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)])
+        self.assertEqual(self.pool._map, self.map_mock_inst)
+        self.assertTrue(self.pool.slave_ok)
+
+    def test__connect(self):
+        client = self.pool._connect()
+        self.client_mock.assert_called_with(
+            conn_timeout=2,
+            password=None,
+            read_timeout=2,
+            cluster_map=self.pool._map,
+            encoding=None,
+            slave_ok=False,
+            database=0)
+        self.assertEqual(self.client_mock_inst, client)
+
+
 class TestPoolUnit(TestCase):
     def setUp(self):
         client_patcher = patch('pyredis.pool.Client', autospeck=True)

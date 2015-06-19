@@ -27,9 +27,12 @@ class PyRedisConnClosed(PyRedisError):
     pass
 
 
-class ProtocolError(PyRedisError):
-    pass
+try:
+    from hiredis import ReplyError, ProtocolError
+except ImportError:
+    class ReplyError(PyRedisError):
+        pass
 
 
-class ReplyError(PyRedisError):
-    pass
+    class ProtocolError(PyRedisError):
+        pass

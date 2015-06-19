@@ -8,6 +8,10 @@ from collections import deque
 import pyredis.client
 from pyredis.exceptions import *
 
+try:
+    from hiredis import ReplyError
+except ImportError:
+    from pyredis.exceptions import ReplyError
 
 class TestClientUnit(TestCase):
     def setUp(self):
@@ -172,18 +176,28 @@ class TestPubSubClientUnit(TestCase):
         connection_patcher = patch('pyredis.client.Connection', autospec=True)
         self.connection_mock = connection_patcher.start()
 
-    def test_get(self):
-        conn_mock = Mock()
-        conn_mock.read.return_value = 'something'
-        self.connection_mock.return_value = conn_mock
+        self.connection_mock_inst = Mock()
+        self.connection_mock.return_value = self.connection_mock_inst
 
-        client = pyredis.client.PubSubClient(host='localhost')
-        self.assertEqual(client._conn, conn_mock)
+        self.client = pyredis.client.PubSubClient(host='localhost')
+
+    def test___init__(self):
+        self.assertEqual(self.client._conn, self.connection_mock_inst)
         self.connection_mock.assert_called_with(
             host='localhost')
-        result = client.get()
-        conn_mock.read.assert_called_with(close_on_timeout=False)
+
+    def test_get(self):
+        self.connection_mock_inst.read.return_value = 'something'
+
+        result = self.client.get()
+        self.connection_mock_inst.read.assert_called_with(close_on_timeout=False)
         self.assertEqual(result, 'something')
+
+    def test_write(self):
+        self.connection_mock_inst.write.return_value = None
+
+        result = self.client.write()
+        self.assertIsNone(result)
 
 
 class TestSentinelClientUnit(TestCase):
@@ -193,7 +207,7 @@ class TestSentinelClientUnit(TestCase):
         connection_patcher = patch('pyredis.client.Connection', autospec=True)
         self.connection_mock = connection_patcher.start()
 
-        dict_from_list_patcher = patch('pyredis.client.dict_from_list', autospec=True)
+        dict_from_list_patcher = patch('pyredis.client.dict_from_list')
         self.dict_from_list_mock = dict_from_list_patcher.start()
 
     def test___init__(self):
@@ -333,7 +347,7 @@ class TestSentinelClientUnit(TestCase):
         client = pyredis.client.SentinelClient(sentinels=sentinels)
         client.execute = Mock()
         client.execute.return_value = list_execute
-        self.dict_from_list_mock.side_effect = (dict_expected1, dict_expected2)
+        self.dict_from_list_mock.side_effect = [dict_expected1, dict_expected2]
         result = client.get_masters()
         client.execute.assert_called_with('SENTINEL', 'masters')
         self.dict_from_list_mock.assert_has_calls([
@@ -369,7 +383,7 @@ class TestSentinelClientUnit(TestCase):
         client = pyredis.client.SentinelClient(sentinels=sentinels)
         client.execute = Mock()
         client.execute.return_value = list_execute
-        self.dict_from_list_mock.side_effect = (dict_expected1, dict_expected2)
+        self.dict_from_list_mock.side_effect = [dict_expected1, dict_expected2]
         result = client.get_slaves('mymaster')
         client.execute.assert_called_with('SENTINEL', 'slaves', 'mymaster')
         self.dict_from_list_mock.assert_has_calls([
@@ -385,5 +399,230 @@ class TestSentinelClientUnit(TestCase):
         client = pyredis.client.SentinelClient(sentinels=sentinels)
         client. close = Mock()
         client.next_sentinel()
-        client.close.assert_called_wit()
+        client.close.assert_called_with()
         self.assertEqual(client.sentinels, expected)
+
+
+class TestClusterClientUnit(TestCase):
+    def setUp(self):
+        self.addCleanup(patch.stopall)
+
+        connection_patcher = patch('pyredis.client.Connection', autospec=True)
+        self.connection_mock = connection_patcher.start()
+
+        clustermap_patcher = patch('pyredis.client.ClusterMap', autospec=True)
+        self.clustermap_mock = clustermap_patcher.start()
+
+        self.clustermap_inst = Mock()
+
+        self.clustermap_mock.return_value = self.clustermap_inst
+
+        self.seeds = [('host1', 12345), ('host2', 12345), ('host3', 12345)]
+        self.client = pyredis.client.ClusterClient(seeds=self.seeds)
+
+    def test___init__seeds(self):
+        self.clustermap_mock.assert_called_with(seeds=self.seeds)
+        self.assertEqual(self.client._map_id, self.clustermap_inst.id)
+
+    def test___init__map(self):
+        map = Mock()
+        client = pyredis.client.ClusterClient(cluster_map=map)
+        self.assertEqual(client._map, map)
+        self.assertEqual(client._map_id, map.id)
+
+    def test___init__map(self):
+        map = Mock()
+        self.assertRaises(
+            PyRedisError,
+            pyredis.client.ClusterClient,
+            seeds=self.seeds,
+            cluster_map=map
+        )
+
+    def test__cleanup_conns(self):
+        conn1_12345 = Mock()
+        conn2_12345 = Mock()
+        conn3_12345 = Mock()
+        self.client._conns['conn1_12345'] = conn1_12345
+        self.client._conns['conn2_12345'] = conn2_12345
+        self.client._conns['conn3_12345'] = conn3_12345
+
+        self.client._map.hosts.return_value = set(['conn1_12345', 'conn3_12345'])
+
+        self.client._cleanup_conns()
+
+        self.assertTrue(conn2_12345.close.called)
+        self.assertFalse(conn1_12345.close.called)
+        self.assertFalse(conn3_12345.close.called)
+        self.assertNotIn('conn2_12345', self.client._conns)
+        self.assertIn('conn1_12345', self.client._conns)
+        self.assertIn('conn3_12345', self.client._conns)
+
+    def test__connect(self):
+        sock = 'conn1_12345'
+
+        conn = Mock()
+        self.connection_mock.return_value = conn
+
+        self.client._connect(sock=sock)
+
+        self.assertEqual(self.client._conns[sock], conn)
+        self.connection_mock.assert_called_with(
+            host='conn1', port=12345,
+            conn_timeout=self.client._conn_timeout,
+            read_timeout=self.client._read_timeout,
+            encoding=self.client._encoding,
+            password=self.client._password,
+            database=self.client._database,
+        )
+
+    def test__get_slot_info(self):
+        self.client._map_id = 42
+        self.client._map.id = 42
+        self.client._map.get_slot.return_value = 'host1_12345'
+
+        self.client._cleanup_conns = Mock()
+
+        result = self.client._get_slot_info(shard_key='testkey')
+
+        self.assertEqual(result, 'host1_12345')
+        self.assertFalse(self.client._cleanup_conns.called)
+
+    def test__get_slot_info_map_changed(self):
+        self.client._map_id = 23
+        self.client._map.id = 42
+        self.client._map.get_slot.return_value = 'host1_12345'
+
+        self.client._cleanup_conns = Mock()
+
+        result = self.client._get_slot_info(shard_key='testkey')
+
+        self.assertEqual(result, 'host1_12345')
+        self.assertTrue(self.client._cleanup_conns.called)
+        self.assertEqual(self.client._map_id, 42)
+
+    def test__get_slot_info_key_error(self):
+        self.client._map_id = 42
+        self.client._map.id = 42
+        self.client._map.update.return_value = 23
+        self.client._map.get_slot.side_effect = [KeyError, 'host1_12345']
+
+        self.client._cleanup_conns = Mock()
+
+        result = self.client._get_slot_info(shard_key='testkey')
+
+        self.assertEqual(result, 'host1_12345')
+        self.assertTrue(self.client._cleanup_conns.called)
+        self.assertEqual(self.client._map_id, 23)
+
+    def test_closed(self):
+        self.assertFalse(self.client.closed)
+
+    def test_execute_sock_not_connected(self):
+        self.client._get_slot_info = Mock()
+        self.client._get_slot_info.return_value = 'host1_12345'
+        conn = Mock()
+        conn.read.return_value = 'success'
+        self.connection_mock.return_value = conn
+
+        result = self.client.execute('GET', 'test', shard_key='test')
+        self.assertEqual(result, 'success')
+        conn.write.assert_called_with('GET', 'test')
+
+    def test_execute_sock_connected(self):
+        self.client._get_slot_info = Mock()
+        self.client._get_slot_info.return_value = 'host1_12345'
+        conn = Mock()
+        conn.read.return_value = 'success'
+
+        self.client._conns['host1_12345'] = conn
+        self.client._connect = Mock()
+
+        result = self.client.execute('GET', 'test', shard_key='test')
+        self.assertEqual(result, 'success')
+        conn.write.assert_called_with('GET', 'test')
+
+    def test_execute_ReplyError_ASK(self):
+        self.client._get_slot_info = Mock()
+        self.client._get_slot_info.return_value = 'host1_12345'
+        conn1 = Mock()
+        conn1.read.side_effect = [ReplyError('ASK 42 host2:12345')]
+        conn2 = Mock()
+        conn2.read.side_effect = ['success']
+        self.connection_mock.side_effect = [conn1, conn2]
+
+        result = self.client.execute('GET', 'test', shard_key='test')
+        self.assertEqual(result, 'success')
+        conn1.write.assert_called_with('GET', 'test')
+        conn2.write.assert_called_with('ASKING', 'GET', 'test')
+
+    def test_execute_ReplyError_MOVED(self):
+        self.client._get_slot_info = Mock()
+        self.client._get_slot_info.side_effect = ['host1_12345', 'host2_12345']
+        conn1 = Mock()
+        conn1.read.side_effect = [ReplyError('MOVED 42 host2:12345')]
+        conn2 = Mock()
+        conn2.read.side_effect = ['success']
+        self.connection_mock.side_effect = [conn1, conn2]
+
+        self.client._cleanup_conns = Mock()
+
+        id = self.client._map_id
+
+        result = self.client.execute('GET', 'test', shard_key='test')
+        self.assertEqual(result, 'success')
+        conn1.write.assert_called_with('GET', 'test')
+        conn2.write.assert_called_with('GET', 'test')
+        self.assertTrue(self.client._cleanup_conns.called)
+        self.clustermap_inst.update.assert_called_with(id)
+
+    def test_execute_ReplyError_to_many_retries(self):
+        self.client._get_slot_info = Mock()
+        self.client._get_slot_info.side_effect = [
+            'host1_12345',
+            'host2_12345',
+            'host3_12345',
+            'host4_12345'
+        ]
+        conn1 = Mock()
+        conn1.read.side_effect = [ReplyError('MOVED 42 host2:12345')]
+        conn2 = Mock()
+        conn2.read.side_effect = [ReplyError('MOVED 42 host2:12345')]
+        conn3 = Mock()
+        conn3.read.side_effect = [ReplyError('MOVED 42 host2:12345')]
+        conn4 = Mock()
+        conn4.read.side_effect = [ReplyError('MOVED 42 host2:12345')]
+        self.connection_mock.side_effect = [conn1, conn2, conn3, conn4]
+
+        self.client._cleanup_conns = Mock()
+
+        self.assertRaises(PyRedisError, self.client.execute, 'GET', 'test', shard_key='test')
+
+        conn1.write.assert_called_with('GET', 'test')
+        conn2.write.assert_called_with('GET', 'test')
+        conn3.write.assert_called_with('GET', 'test')
+        self.assertFalse(conn4.write.called)
+
+    def test_execute_PyRedisConnError(self):
+        self.client._get_slot_info = Mock()
+        self.client._get_slot_info.side_effect = ['host1_12345']
+        conn1 = Mock()
+        conn1.read.side_effect = [PyRedisConnError]
+        self.connection_mock.side_effect = [conn1]
+
+        self.assertRaises(PyRedisConnError, self.client.execute, 'GET', 'test', shard_key='test')
+        self.assertTrue(conn1.close.called)
+        self.assertNotIn(conn1, self.client._conns)
+        self.clustermap_inst.update.assert_called_with(self.client._map_id)
+
+    def test_execute_PyRedisConnReadTimeout(self):
+        self.client._get_slot_info = Mock()
+        self.client._get_slot_info.side_effect = ['host1_12345']
+        conn1 = Mock()
+        conn1.read.side_effect = [PyRedisConnReadTimeout]
+        self.connection_mock.side_effect = [conn1]
+
+        self.assertRaises(PyRedisConnReadTimeout, self.client.execute, 'GET', 'test', shard_key='test')
+        self.assertTrue(conn1.close.called)
+        self.assertNotIn(conn1, self.client._conns)
+        self.clustermap_inst.update.assert_called_with(self.client._map_id)

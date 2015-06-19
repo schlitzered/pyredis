@@ -4,9 +4,8 @@ from collections import deque
 
 from pyredis import commands
 from pyredis.connection import Connection
-from pyredis.exceptions import *
-from pyredis.helper import dict_from_list
-
+from pyredis.exceptions import PyRedisError, PyRedisConnError, PyRedisConnReadTimeout, ReplyError
+from pyredis.helper import dict_from_list, ClusterMap
 
 class Client(
     commands.Connection,
@@ -41,6 +40,7 @@ class Client(
         pyredis.Client takes the same arguments as pyredis.connection.Connection.
     """
     def __init__(self, **kwargs):
+        super().__init__()
         self._conn = Connection(**kwargs)
         self._bulk = False
         self._bulk_keep = False
@@ -79,7 +79,7 @@ class Client(
         Put the client into bulk mode. Instead of executing a command & waiting for
         the reply, all commands are send to Redis without fetching the result.
         The results get fetched whenever $bulk_size commands have been executed,
-        which will also resets the counter.
+        which will also resets the counter, or of bulk_stop() is called.
 
         :param bulk_size:
             Number of commands to execute, before fetching results.
@@ -105,7 +105,8 @@ class Client(
 
         All outstanding results from previous commands get fetched.
         If bulk_start was called with keep_results=True, return a list with all
-        results from the executed commands.
+        results from the executed commands in order. The list of results can also contain
+        Exceptions, hat you should check for.
 
         :return: None, list
         """
@@ -149,8 +150,176 @@ class Client(
             self._execute_bulk(*args)
 
 
-class ClusterClient(object):
-    pass
+class ClusterClient(
+    commands.Connection,
+    commands.Hash,
+    commands.HyperLogLog,
+    commands.Key,
+    commands.List,
+    commands.Scripting,
+    commands.Set,
+    commands.SSet,
+    commands.String,
+    commands.Transaction
+):
+    """ Base Client for Talking to Redis Cluster.
+
+    Inherits the following Commmand classes:
+      - commands.Connection,
+      - commands.Hash,
+      - commands.HyperLogLog,
+      - commands.Key,
+      - commands.List,
+      - commands.Scripting,
+      - commands.Set,
+      - commands.SSet,
+      - commands.String,
+      - commands.Transaction
+
+    :param seeds:
+        Accepts a list of seed nodes in this form: [('seed1', 6379), ('seed2', 6379), ('seed3', 6379)]
+    :type seeds: list
+
+    :param slave_ok:
+        Set to True if this Client should use slave nodes.
+    :type slave_ok: bool
+
+    :param database:
+        Select which db should be used for this connection
+    :type database: int
+
+    :param password:
+        Password used for authentication. If None, no authentication is done
+    :type password: str
+
+    :param encoding:
+        Convert result strings with this encoding. If None, no encoding is done.
+    :type encoding: str
+
+    :param conn_timeout:
+        Connect Timeout.
+    :type conn_timeout: float
+
+    :param read_timeout:
+        Read Timeout.
+    :type read_timeout: float
+    """
+    def __init__(
+            self,
+            seeds=None,
+            database=0,
+            password=None,
+            encoding=None,
+            slave_ok=False,
+            conn_timeout=2,
+            read_timeout=2,
+            cluster_map=None):
+        super().__init__()
+        if not bool(seeds) != bool(cluster_map):
+            raise PyRedisError('Ether seeds or cluster_map has to be provided')
+        self._cluster = True
+        self._conns = {}
+        self._conn_timeout = conn_timeout
+        self._read_timeout = read_timeout
+        self._encoding = encoding
+        self._password = password
+        self._database = database
+        self._slave_ok = slave_ok
+        if cluster_map:
+            self._map = cluster_map
+        else:
+            self._map = ClusterMap(seeds=seeds)
+        self._map_id = self._map.id
+
+    def _cleanup_conns(self):
+        hosts = self._map.hosts(slave=self._slave_ok)
+        wipe = set()
+        for conn in self._conns.keys():
+            if conn not in hosts:
+                wipe.add(conn)
+
+        for conn in wipe:
+            self._conns[conn].close()
+            del self._conns[conn]
+
+    def _connect(self, sock):
+        host, port = sock.split('_')
+        client = Connection(
+            host=host, port=int(port),
+            conn_timeout=self._conn_timeout,
+            read_timeout=self._read_timeout,
+            encoding=self._encoding,
+            password=self._password,
+            database=self._database
+        )
+        self._conns[sock] = client
+
+    def _get_slot_info(self, shard_key):
+        if self._map_id != self._map.id:
+            self._map_id = self._map.id
+            self._cleanup_conns()
+        try:
+            return self._map.get_slot(shard_key, self._slave_ok)
+        except KeyError:
+            self._map_id = self._map.update(self._map_id)
+            self._cleanup_conns()
+            return self._map.get_slot(shard_key, self._slave_ok)
+
+    @property
+    def closed(self):
+        return False
+
+    def execute(self, *args, shard_key=None, sock=None, asking=False, retries=3):
+        """ Execute arbitrary redis command.
+
+        :param args:
+        :type args: list, int, float
+
+        :param shard_key: (optional)
+            Should be set to the key name you try to work with.
+            Can not be used if sock is set.
+        :type shard_key: string
+
+        :param sock: (optional)
+            The string representation of a socket, the command should be executed against.
+            For example: "testhost_6379"
+            Can not be used if shard_key is set.
+        :type sock: string
+
+        :return: result, exception
+        """
+        if not bool(shard_key) != bool(sock):
+            raise PyRedisError('Ether shard_key or sock has to be provided')
+        if not sock:
+            sock = self._get_slot_info(shard_key)
+        if sock not in self._conns.keys():
+            self._connect(sock)
+        try:
+            if asking:
+                self._conns[sock].write('ASKING', *args)
+            else:
+                self._conns[sock].write(*args)
+            return self._conns[sock].read()
+        except ReplyError as err:
+            errstr = str(err)
+            if retries <= 1 and (errstr.startswith('MOVED') or errstr.startswith('ASK')):
+                raise PyRedisError('Slot moved to often or wrong shard_key, giving up,')
+            if errstr.startswith('MOVED'):
+                if not shard_key:
+                    raise ReplyError('Explicitly set socket, but key does not belong to this redis: {0}'.format(sock))
+                self._map_id = self._map.update(self._map_id)
+                self._cleanup_conns()
+                return self.execute(*args, shard_key=shard_key, retries=retries-1)
+            elif errstr.startswith('ASK'):
+                sock = errstr.split()[2].replace(':', '_')
+                return self.execute(*args, sock=sock, retries=retries-1, asking=True)
+            else:
+                raise err
+        except (PyRedisConnError, PyRedisConnReadTimeout) as err:
+            self._conns[sock].close()
+            del self._conns[sock]
+            self._map.update(self._map_id)
+            raise err
 
 
 class PubSubClient(commands.Subscribe):
@@ -178,6 +347,9 @@ class PubSubClient(commands.Subscribe):
         :return: bool
         """
         return self._conn.closed
+
+    def write(self, *args):
+        return self._conn.write(*args)
 
     def get(self):
         """ Fetch published item from Redis.

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API Documentation &mdash; pyredis 0.0.1 documentation</title>
+    <title>API Documentation &mdash; pyredis 0.0.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.1',
+        VERSION:     '0.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyredis 0.0.1 documentation" href="index.html" />
+    <link rel="top" title="pyredis 0.0.2 documentation" href="index.html" />
     <link rel="prev" title="Usage Example" href="example.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="example.html" title="Usage Example"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyredis 0.0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,7 +53,7 @@
 <dt id="pyredis.connection.Connection">
 <em class="property">class </em><tt class="descclassname">pyredis.connection.</tt><tt class="descname">Connection</tt><big>(</big><em>host=None</em>, <em>port=6379</em>, <em>unix_sock=None</em>, <em>database=0</em>, <em>password=None</em>, <em>encoding=None</em>, <em>conn_timeout=2</em>, <em>read_timeout=2</em>, <em>sentinel=False</em><big>)</big><a class="headerlink" href="#pyredis.connection.Connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Low level client for talking to a Redis Server.</p>
-<p>This class is should not be used directly used to talk to a Redis server
+<p>This class is should not be used directly to talk to a Redis server,
 unless you know what you are doing. In most cases it should be
 sufficient to use one of the Client classes, or one of the Connection Pools.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -61,11 +61,11 @@ sufficient to use one of the Client classes, or one of the Connection Pools.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>host</strong> (<em>str</em>) &#8211; Host IP or Name to connect to.
-Can only be set when unix_sock is None.</li>
-<li><strong>port</strong> (<em>int</em>) &#8211; Port to connect to, only used when host is also set</li>
-<li><strong>unix_sock</strong> (<em>str</em>) &#8211; Unix Socket to connect to
-Can only be set when host is None.</li>
+<li><strong>host</strong> (<em>str</em>) &#8211; Host IP or Name to connect,
+can only be set when unix_sock is None.</li>
+<li><strong>port</strong> (<em>int</em>) &#8211; Port to connect, only used when host is also set.</li>
+<li><strong>unix_sock</strong> (<em>str</em>) &#8211; Unix Socket to connect,
+can only be set when host is None.</li>
 <li><strong>database</strong> (<em>int</em>) &#8211; Select which db should be used for this connection</li>
 <li><strong>password</strong> (<em>str</em>) &#8211; Password used for authentication. If None, no authentication is done</li>
 <li><strong>encoding</strong> (<em>str</em>) &#8211; Convert result strings with this encoding. If None, no encoding is done.</li>
@@ -186,7 +186,7 @@ Can only be set when host is None.</li>
 <p>Put the client into bulk mode. Instead of executing a command &amp; waiting for
 the reply, all commands are send to Redis without fetching the result.
 The results get fetched whenever $bulk_size commands have been executed,
-which will also resets the counter.</p>
+which will also resets the counter, or of bulk_stop() is called.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -210,7 +210,8 @@ which will also resets the counter.</p>
 <dd><p>Stop bulk mode.</p>
 <p>All outstanding results from previous commands get fetched.
 If bulk_start was called with keep_results=True, return a list with all
-results from the executed commands.</p>
+results from the executed commands in order. The list of results can also contain
+Exceptions, hat you should check for.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -272,8 +273,69 @@ results from the executed commands.</p>
 <h3>ClusterClient<a class="headerlink" href="#clusterclient" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyredis.ClusterClient">
-<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">ClusterClient</tt><a class="headerlink" href="#pyredis.ClusterClient" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">ClusterClient</tt><big>(</big><em>seeds=None</em>, <em>database=0</em>, <em>password=None</em>, <em>encoding=None</em>, <em>slave_ok=False</em>, <em>conn_timeout=2</em>, <em>read_timeout=2</em>, <em>cluster_map=None</em><big>)</big><a class="headerlink" href="#pyredis.ClusterClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Client for Talking to Redis Cluster.</p>
+<dl class="docutils">
+<dt>Inherits the following Commmand classes:</dt>
+<dd><ul class="first last simple">
+<li>commands.Connection,</li>
+<li>commands.Hash,</li>
+<li>commands.HyperLogLog,</li>
+<li>commands.Key,</li>
+<li>commands.List,</li>
+<li>commands.Scripting,</li>
+<li>commands.Set,</li>
+<li>commands.SSet,</li>
+<li>commands.String,</li>
+<li>commands.Transaction</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>seeds</strong> (<em>list</em>) &#8211; Accepts a list of seed nodes in this form: [(&#8216;seed1&#8217;, 6379), (&#8216;seed2&#8217;, 6379), (&#8216;seed3&#8217;, 6379)]</li>
+<li><strong>slave_ok</strong> (<em>bool</em>) &#8211; Set to True if this Client should use slave nodes.</li>
+<li><strong>database</strong> (<em>int</em>) &#8211; Select which db should be used for this connection</li>
+<li><strong>password</strong> (<em>str</em>) &#8211; Password used for authentication. If None, no authentication is done</li>
+<li><strong>encoding</strong> (<em>str</em>) &#8211; Convert result strings with this encoding. If None, no encoding is done.</li>
+<li><strong>conn_timeout</strong> (<em>float</em>) &#8211; Connect Timeout.</li>
+<li><strong>read_timeout</strong> (<em>float</em>) &#8211; Read Timeout.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyredis.ClusterClient.execute">
+<tt class="descname">execute</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em>, <em>asking=False</em>, <em>retries=3</em><big>)</big><a class="headerlink" href="#pyredis.ClusterClient.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute arbitrary redis command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<em>list, int, float</em>) &#8211; </li>
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; (optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; (optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="pubsubclient">
@@ -287,7 +349,7 @@ results from the executed commands.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; pyredis.Client takes the same arguments as pyredis.connection.Connection.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; pyredis.PubSubClient takes the same arguments as pyredis.connection.Connection.</td>
 </tr>
 </tbody>
 </table>
@@ -342,6 +404,14 @@ results from the executed commands.</p>
 <dt id="pyredis.SentinelClient">
 <em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">SentinelClient</tt><big>(</big><em>sentinels</em><big>)</big><a class="headerlink" href="#pyredis.SentinelClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Redis Sentinel Client.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sentinels</strong> (<em>list</em>) &#8211; Accepts a list of sentinels in this form: [(&#8216;sentinel1&#8217;, 26379), (&#8216;sentinel2&#8217;, 26379), (&#8216;sentinel3&#8217;, 26379)]</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="pyredis.SentinelClient.close">
 <tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.SentinelClient.close" title="Permalink to this definition">¶</a></dt>
@@ -452,22 +522,369 @@ results from the executed commands.</p>
 
 </div>
 </div>
+<div class="section" id="pool">
+<h2>Pool<a class="headerlink" href="#pool" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basepool">
+<h3>BasePool<a class="headerlink" href="#basepool" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.pool.BasePool">
+<em class="property">class </em><tt class="descclassname">pyredis.pool.</tt><tt class="descname">BasePool</tt><big>(</big><em>database=0</em>, <em>password=None</em>, <em>encoding=None</em>, <em>conn_timeout=2</em>, <em>read_timeout=2</em>, <em>pool_size=16</em>, <em>lock=&lt;_thread.lock object at 0x7fb75318ae40&gt;</em><big>)</big><a class="headerlink" href="#pyredis.pool.BasePool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Class for all other pools.</p>
+<p>All other pools inherit from this base class.
+This class itself, cannot be used directly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>database</strong> (<em>int</em>) &#8211; Select which db should be used for this pool</li>
+<li><strong>password</strong> (<em>str</em>) &#8211; Password used for authentication. If None, no authentication is done</li>
+<li><strong>encoding</strong> (<em>str</em>) &#8211; Convert result strings with this encoding. If None, no encoding is done.</li>
+<li><strong>conn_timeout</strong> (<em>float</em>) &#8211; Connect Timeout.</li>
+<li><strong>read_timeout</strong> (<em>float</em>) &#8211; Read Timeout.</li>
+<li><strong>pool_size</strong> (<em>int</em>) &#8211; Upper limit of connections this pool can handle.</li>
+<li><strong>lock</strong> (<em>_lock object, defaults to threading.Lock</em>) &#8211; Class implementing a Lock.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyredis.pool.BasePool.acquire">
+<tt class="descname">acquire</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.pool.BasePool.acquire" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acquire a client connection from the pool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">redis.Client, exception</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.pool.BasePool.conn_timeout">
+<tt class="descname">conn_timeout</tt><a class="headerlink" href="#pyredis.pool.BasePool.conn_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured connection timeout</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.pool.BasePool.database">
+<tt class="descname">database</tt><a class="headerlink" href="#pyredis.pool.BasePool.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.pool.BasePool.encoding">
+<tt class="descname">encoding</tt><a class="headerlink" href="#pyredis.pool.BasePool.encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured encoding</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str, None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.pool.BasePool.password">
+<tt class="descname">password</tt><a class="headerlink" href="#pyredis.pool.BasePool.password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured password for this pool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str, None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.pool.BasePool.pool_size">
+<tt class="descname">pool_size</tt><a class="headerlink" href="#pyredis.pool.BasePool.pool_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return, or adjust the current pool size.
+Shrinking the pool is currently not implemented.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int, None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.pool.BasePool.read_timeout">
+<tt class="descname">read_timeout</tt><a class="headerlink" href="#pyredis.pool.BasePool.read_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured read timeout</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyredis.pool.BasePool.release">
+<tt class="descname">release</tt><big>(</big><em>conn</em><big>)</big><a class="headerlink" href="#pyredis.pool.BasePool.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a client connection to the pool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conn</strong> &#8211; redis.Client instance, managed by this pool.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="clusterpool">
+<h3>ClusterPool<a class="headerlink" href="#clusterpool" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.ClusterPool">
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">ClusterPool</tt><big>(</big><em>seeds</em>, <em>slave_ok=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyredis.ClusterPool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Redis Cluster Pool.</p>
+<p>Inherits all the arguments, methods and attributes from BasePool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>seeds</strong> &#8211; Accepts a list of seed nodes in this form: [(&#8216;host1&#8217;, 6379), (&#8216;host2&#8217;, 6379), (&#8216;host3&#8217;, 6379)]</li>
+<li><strong>slave_ok</strong> (<em>bool</em>) &#8211; Defaults to False. If True, this pool will return connections to slave instances.</li>
+<li><strong>retries</strong> (<em>int</em>) &#8211; In case there is a chunk move ongoing, while executing a command, how many times should
+we try to find the right node, before giving up.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pyredis.ClusterPool.slave_ok">
+<tt class="descname">slave_ok</tt><a class="headerlink" href="#pyredis.ClusterPool.slave_ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this pool will return slave connections</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>Pool<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.Pool">
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">Pool</tt><big>(</big><em>host=None</em>, <em>port=6379</em>, <em>unix_sock=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyredis.Pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pool for straight connections to Redis</p>
+<p>Inherits all the arguments, methods and attributes from BasePool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<em>str</em>) &#8211; Host IP or Name to connect,
+can only be set when unix_sock is None.</li>
+<li><strong>port</strong> (<em>int</em>) &#8211; Port to connect, only used when host is also set.</li>
+<li><strong>unix_sock</strong> (<em>str</em>) &#8211; Unix Socket to connect,
+can only be set when host is None.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pyredis.Pool.host">
+<tt class="descname">host</tt><a class="headerlink" href="#pyredis.Pool.host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured host.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str, None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.Pool.port">
+<tt class="descname">port</tt><a class="headerlink" href="#pyredis.Pool.port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.Pool.unix_sock">
+<tt class="descname">unix_sock</tt><a class="headerlink" href="#pyredis.Pool.unix_sock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return configured Unix socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str, None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="sentinelpool">
+<h3>SentinelPool<a class="headerlink" href="#sentinelpool" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyredis.SentinelPool">
+<em class="property">class </em><tt class="descclassname">pyredis.</tt><tt class="descname">SentinelPool</tt><big>(</big><em>sentinels</em>, <em>name</em>, <em>slave_ok=False</em>, <em>retries=3</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyredis.SentinelPool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sentinel backed Pool.</p>
+<p>Inherits all the arguments, methods and attributes from BasePool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sentinels</strong> (<em>list</em>) &#8211; Accepts a list of sentinels in this form: [(&#8216;sentinel1&#8217;, 26379), (&#8216;sentinel2&#8217;, 26379), (&#8216;sentinel3&#8217;, 26379)]</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; Name of the cluster managed by sentinel, that this pool should manage.</li>
+<li><strong>slave_ok</strong> (<em>bool</em>) &#8211; Defaults to False. If True, this pool will return connections to slave instances.</li>
+<li><strong>retries</strong> (<em>int</em>) &#8211; In case a sentinel delivers stale data, how many other sentinels should be tried.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pyredis.SentinelPool.name">
+<tt class="descname">name</tt><a class="headerlink" href="#pyredis.SentinelPool.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the configured Sentinel managed cluster.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.SentinelPool.retries">
+<tt class="descname">retries</tt><a class="headerlink" href="#pyredis.SentinelPool.retries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of retries in case of stale sentinel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.SentinelPool.sentinels">
+<tt class="descname">sentinels</tt><a class="headerlink" href="#pyredis.SentinelPool.sentinels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deque with configured sentinels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">deque</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyredis.SentinelPool.slave_ok">
+<tt class="descname">slave_ok</tt><a class="headerlink" href="#pyredis.SentinelPool.slave_ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this pool return slave connections</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="commands">
 <h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id2">
-<h3>Connection<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Connection<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyredis.commands.Connection">
 <em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Connection</tt><a class="headerlink" href="#pyredis.commands.Connection" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="pyredis.commands.Connection.echo">
-<tt class="descname">echo</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Connection.echo" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">echo</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Connection.echo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute ECHO Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -475,13 +892,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Connection.ping">
-<tt class="descname">ping</tt><big>(</big><big>)</big><a class="headerlink" href="#pyredis.commands.Connection.ping" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">ping</tt><big>(</big><em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Connection.ping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute PING Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result,exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result,exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -821,13 +1254,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Key.keys">
-<tt class="descname">keys</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.keys" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">keys</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute KEYS Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -863,13 +1312,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Key.object">
-<tt class="descname">object</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.object" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">object</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.object" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute OBJECT Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -933,13 +1398,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Key.randomkey">
-<tt class="descname">randomkey</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.randomkey" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">randomkey</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.randomkey" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute RANDOMKEY Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -989,13 +1470,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Key.scan">
-<tt class="descname">scan</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.scan" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">scan</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Key.scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute SCAN Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1321,13 +1818,29 @@ results from the executed commands.</p>
 <em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Scripting</tt><a class="headerlink" href="#pyredis.commands.Scripting" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="pyredis.commands.Scripting.eval">
-<tt class="descname">eval</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.eval" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">eval</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.eval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute EVAL Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1335,13 +1848,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Scripting.evalsha">
-<tt class="descname">evalsha</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.evalsha" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">evalsha</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.evalsha" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute EVALSHA Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1349,13 +1878,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Scripting.script_exists">
-<tt class="descname">script_exists</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_exists" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">script_exists</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute SCRIPT EXISTS Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1363,13 +1908,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Scripting.script_flush">
-<tt class="descname">script_flush</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_flush" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">script_flush</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_flush" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute SCRIPT FLUSH Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1377,13 +1938,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Scripting.script_kill">
-<tt class="descname">script_kill</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_kill" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">script_kill</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_kill" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute SCRIPT KILL Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1391,13 +1968,29 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Scripting.script_load">
-<tt class="descname">script_load</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_load" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">script_load</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Scripting.script_load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute SCRIPT LOAD Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result, exception</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -2313,7 +2906,7 @@ results from the executed commands.</p>
 <em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Transaction</tt><a class="headerlink" href="#pyredis.commands.Transaction" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="pyredis.commands.Transaction.discard">
-<tt class="descname">discard</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.discard" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">discard</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.discard" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute DISCARD Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2327,7 +2920,7 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Transaction.exec">
-<tt class="descname">exec</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.exec" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">exec</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.exec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute EXEC Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2341,7 +2934,7 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Transaction.multi">
-<tt class="descname">multi</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.multi" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">multi</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.multi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute MULTI Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2355,7 +2948,7 @@ results from the executed commands.</p>
 
 <dl class="method">
 <dt id="pyredis.commands.Transaction.unwatch">
-<tt class="descname">unwatch</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.unwatch" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">unwatch</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big><a class="headerlink" href="#pyredis.commands.Transaction.unwatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute UNWATCH Command, consult Redis documentation for details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2384,9 +2977,194 @@ results from the executed commands.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="id4">
+<h3>Scripting<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyredis.commands.</tt><tt class="descname">Scripting</tt></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">eval</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big></dt>
+<dd><p>Execute EVAL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">evalsha</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big></dt>
+<dd><p>Execute EVALSHA Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">script_exists</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big></dt>
+<dd><p>Execute SCRIPT EXISTS Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">script_flush</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big></dt>
+<dd><p>Execute SCRIPT FLUSH Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">script_kill</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big></dt>
+<dd><p>Execute SCRIPT KILL Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">script_load</tt><big>(</big><em>*args</em>, <em>shard_key=None</em>, <em>sock=None</em><big>)</big></dt>
+<dd><p>Execute SCRIPT LOAD Command, consult Redis documentation for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shard_key</strong> (<em>string</em>) &#8211; <p>(optional)
+Should be set to the key name you try to work with.
+Can not be used if sock is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+<li><strong>sock</strong> (<em>string</em>) &#8211; <p>(optional)
+The string representation of a socket, the command should be executed against.
+For example: &#8220;testhost_6379&#8221;
+Can not be used if shard_key is set.</p>
+<p>Only used if used with a Cluster Client</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result, exception</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="pool">
-<h2>Pool<a class="headerlink" href="#pool" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -2407,8 +3185,15 @@ results from the executed commands.</p>
 <li><a class="reference internal" href="#sentinelclient">SentinelClient</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#pool">Pool</a><ul>
+<li><a class="reference internal" href="#basepool">BasePool</a></li>
+<li><a class="reference internal" href="#clusterpool">ClusterPool</a></li>
+<li><a class="reference internal" href="#id2">Pool</a></li>
+<li><a class="reference internal" href="#sentinelpool">SentinelPool</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#commands">Commands</a><ul>
-<li><a class="reference internal" href="#id2">Connection</a></li>
+<li><a class="reference internal" href="#id3">Connection</a></li>
 <li><a class="reference internal" href="#hash">Hash</a></li>
 <li><a class="reference internal" href="#hyperloglog">HyperLogLog</a></li>
 <li><a class="reference internal" href="#key">Key</a></li>
@@ -2420,9 +3205,9 @@ results from the executed commands.</p>
 <li><a class="reference internal" href="#string">String</a></li>
 <li><a class="reference internal" href="#subscribe">Subscribe</a></li>
 <li><a class="reference internal" href="#transaction">Transaction</a></li>
+<li><a class="reference internal" href="#id4">Scripting</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pool">Pool</a></li>
 </ul>
 </li>
 </ul>
@@ -2461,7 +3246,7 @@ results from the executed commands.</p>
         <li class="right" >
           <a href="example.html" title="Usage Example"
              >previous</a> |</li>
-        <li><a href="index.html">pyredis 0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyredis 0.0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

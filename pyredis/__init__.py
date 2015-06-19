@@ -10,17 +10,20 @@ License: MIT (see LICENSE for details)
 
 from pyredis.exceptions import *
 from pyredis.client import Client, ClusterClient, PubSubClient, SentinelClient
-from pyredis.pool import Pool, SentinelPool
+from pyredis.pool import ClusterPool, Pool, SentinelPool
 
 __all__ = [
     'Client',
-    'ClusterClient'
+    'ClusterClient',
+    'ClusterPool',
     'PubSubClient',
     'SentinelClient',
     'Pool',
     'SentinelPool',
-    'PyRedisError',
     'PyRedisConnError',
+    'PyRedisConnReadTimeout',
+    'PyRedisConnClosed',
+    'PyRedisError',
     'ProtocolError',
     'ReplyError'
 ]

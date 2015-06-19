@@ -61,6 +61,19 @@ Using a Connection Pool
     pool.release(client)
 
 
+Using a Cluster Connection Pool
+-------------------------------
+.. code:: python
+
+    from pyredis import ClusterPool
+
+    pool = ClusterPool(seeds=[('seed1', 6379), ('seed2', 6379), ('seed3', 6379)])
+    client = pool.aquire()
+    client.ping(shard_key='test')
+    b'PONG'
+    pool.release(client)
+
+
 Using a Sentinel backed Connection Pool
 ---------------------------------------
 .. code:: python
