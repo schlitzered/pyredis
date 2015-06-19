@@ -1,12 +1,16 @@
 from setuptools import setup
 
-import pyredis
-
 setup(
     name='python_redis',
     version='0.0.3',
     description='Redis Client',
-    long_description=pyredis.__doc__,
+    long_description="""
+Redis Client implementation for Python 3.
+
+Copyright (c) 2015, Stephan Schultchen.
+
+License: MIT (see LICENSE for details)
+    """,
     packages=['pyredis'],
     url='https://github.com/schlitzered/pyredis',
     license='MIT',
