@@ -11,7 +11,7 @@ Currently implemented Features:
   - Connection Pool
   - Sentinel Backed Connection Pool
   - Client & Pool for Redis Cluster
-  - Redis Mode ( Not Supported with Redis Cluster )
+  - Bulk Mode ( Not Supported with Redis Cluster )
 
 Planned Features:
   - Client & Pool for Redis Cluster
