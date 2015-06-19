@@ -4,7 +4,7 @@ import pyredis
 
 setup(
     name='python_redis',
-    version='0.0.2',
+    version='0.0.3',
     description='Redis Client',
     long_description=pyredis.__doc__,
     packages=['pyredis'],
