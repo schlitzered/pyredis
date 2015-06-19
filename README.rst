@@ -1,8 +1,8 @@
 Introduction
 ************
-Redis Client implementation for Python. The Client is in an early stage and only
-supports Python 3 for the moment. If there is enough interest, i will make it work
-with Python 2.
+Redis Client implementation for Python.
+The Client only supports Python 3 for the moment.
+If there is enough interest, i will make it work with Python 2.
 
 Currently implemented Features:
   - Base Redis Client
@@ -10,6 +10,8 @@ Currently implemented Features:
   - Sentinel Client
   - Connection Pool
   - Sentinel Backed Connection Pool
+  - Client & Pool for Redis Cluster
+  - Redis Mode ( Not Supported with Redis Cluster )
 
 Planned Features:
   - Client & Pool for Redis Cluster
