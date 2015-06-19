@@ -18,6 +18,9 @@ setup(
             'License :: OSI Approved :: MIT License',
             'Programming Language :: Python :: 3'
     ],
+    setup_requires=[
+        'crc16'
+    ],
     install_requires=[
         'crc16'
     ],
