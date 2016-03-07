@@ -14,7 +14,6 @@ Currently implemented Features:
   - Bulk Mode ( Not Supported with Redis Cluster )
 
 Planned Features:
-  - Client & Pool for Redis Cluster
   - Python 2 support ( if there is enough interest )
 
 
@@ -28,7 +27,7 @@ Installing
 
 pyredis can be installed via pip as follows:
 ::
-    pip install pyredis
+    pip install python_redis
 
 Author
 ------

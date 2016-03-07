@@ -23,7 +23,7 @@ pyredis can be installed via pip as follows:
 
 .. code::
 
-    pip install pyredis
+    pip install python_redis
 
 Author
 ------
