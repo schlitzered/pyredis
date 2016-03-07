@@ -10,7 +10,7 @@ Currently implemented Features:
   - Connection Pool
   - Sentinel Backed Connection Pool
   - Client & Pool for Redis Cluster
-  - Bulk Insert Mode ( Not supported with Redis Cluster )
+  - Bulk Mode ( Not supported with Redis Cluster )
 
 Planned Features:
   - Python 2 support ( If there is enough interest )

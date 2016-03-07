@@ -7,6 +7,7 @@ from pyredis.connection import Connection
 from pyredis.exceptions import PyRedisError, PyRedisConnError, PyRedisConnReadTimeout, ReplyError
 from pyredis.helper import dict_from_list, ClusterMap
 
+
 class Client(
     commands.Connection,
     commands.Hash,

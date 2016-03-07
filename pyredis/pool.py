@@ -2,6 +2,7 @@ __author__ = 'schlitzer'
 
 from random import shuffle
 import threading
+from pyredis import commands
 from pyredis.client import Client, ClusterClient, SentinelClient
 from pyredis.exceptions import *
 from pyredis.helper import ClusterMap
@@ -61,6 +62,7 @@ class BasePool(object):
         self._encoding = encoding
         self._pool_size = pool_size
         self._close_on_err = False
+        self._cluster = False
 
     @property
     def conn_timeout(self):
@@ -164,7 +166,18 @@ class BasePool(object):
             self._lock.release()
 
 
-class ClusterPool(BasePool):
+class ClusterPool(
+    BasePool,
+    commands.Connection,
+    commands.Hash,
+    commands.HyperLogLog,
+    commands.Key,
+    commands.List,
+    commands.Scripting,
+    commands.Set,
+    commands.SSet,
+    commands.String,
+):
     """ Redis Cluster Pool.
 
     Inherits all the arguments, methods and attributes from BasePool.
@@ -187,6 +200,7 @@ class ClusterPool(BasePool):
         super().__init__(**kwargs)
         self._map = ClusterMap(seeds=seeds)
         self._slave_ok = slave_ok
+        self._cluster = True
 
     @property
     def slave_ok(self):
@@ -207,8 +221,34 @@ class ClusterPool(BasePool):
             cluster_map=self._map
         )
 
+    def execute(self, *args, **kwargs):
+        """ Execute arbitrary redis command.
 
-class Pool(BasePool):
+        :param args:
+        :type args: list, int, float
+
+        :return: result, exception
+        """
+        conn = self.acquire()
+        try:
+            return conn.execute(*args, **kwargs)
+        finally:
+            self.release(conn)
+
+
+class Pool(
+    BasePool,
+    commands.Connection,
+    commands.Hash,
+    commands.HyperLogLog,
+    commands.Key,
+    commands.List,
+    commands.Publish,
+    commands.Scripting,
+    commands.Set,
+    commands.SSet,
+    commands.String,
+):
     """ Pool for straight connections to Redis
 
     Inherits all the arguments, methods and attributes from BasePool.
@@ -272,8 +312,34 @@ class Pool(BasePool):
             read_timeout=self.read_timeout
             )
 
+    def execute(self, *args):
+        """ Execute arbitrary redis command.
 
-class SentinelPool(BasePool):
+        :param args:
+        :type args: list, int, float
+
+        :return: result, exception
+        """
+        conn = self.acquire()
+        try:
+            return conn.execute(*args)
+        finally:
+            self.release(conn)
+
+
+class SentinelPool(
+    BasePool,
+    commands.Connection,
+    commands.Hash,
+    commands.HyperLogLog,
+    commands.Key,
+    commands.List,
+    commands.Publish,
+    commands.Scripting,
+    commands.Set,
+    commands.SSet,
+    commands.String,
+):
     """ Sentinel backed Pool.
 
     Inherits all the arguments, methods and attributes from BasePool.
@@ -382,3 +448,17 @@ class SentinelPool(BasePool):
             else:
                 client.close()
         self._sentinel.next_sentinel()
+
+    def execute(self, *args):
+        """ Execute arbitrary redis command.
+
+        :param args:
+        :type args: list, int, float
+
+        :return: result, exception
+        """
+        conn = self.acquire()
+        try:
+            return conn.execute(*args)
+        finally:
+            self.release(conn)
