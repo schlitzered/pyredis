@@ -2,12 +2,12 @@ from setuptools import setup
 
 setup(
     name='python_redis',
-    version='0.0.5',
+    version='0.0.6',
     description='Redis Client',
     long_description="""
 Redis Client implementation for Python 3.
 
-Copyright (c) 2015, Stephan Schultchen.
+Copyright (c) 2016, Stephan Schultchen.
 
 License: MIT (see LICENSE for details)
     """,
