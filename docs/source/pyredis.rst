@@ -80,6 +80,12 @@ HyperLogLog
 -----------
 
 .. autoclass:: pyredis.commands.HyperLogLog
+:members:
+
+Geo
+---
+
+.. autoclass:: pyredis.commands.Geo
    :members:
 
 Key

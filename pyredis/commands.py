@@ -77,6 +77,65 @@ class Connection(BaseCommand):
         return self.execute('PING')
 
 
+class Geo(BaseCommand):
+    def __init__(self):
+        super().__init__()
+
+    def geoadd(self, *args):
+        """ Execute GEOADD Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('GEOADD', *args, shard_key=args[0])
+        return self.execute('GEOADD', *args)
+
+    def geodist(self, *args):
+        """ Execute GEODIST Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('GEODIST', *args, shard_key=args[0])
+        return self.execute('GEODIST', *args)
+
+    def geohash(self, *args):
+        """ Execute GEOHASH Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('GEOHASH', *args, shard_key=args[0])
+        return self.execute('GEOHASH', *args)
+
+    def georadius(self, *args):
+        """ Execute GEORADIUS Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('GEORADIUS', *args, shard_key=args[0])
+        return self.execute('GEORADIUS', *args)
+
+    def geopos(self, *args):
+        """ Execute GEOPOS Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('GEOPOS', *args, shard_key=args[0])
+        return self.execute('GEOPOS', *args)
+
+    def georadiusbymember(self, *args):
+        """ Execute GEORADIUSBYMEMBER Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('GEORADIUSBYMEMBER', *args, shard_key=args[0])
+        return self.execute('GEORADIUSBYMEMBER', *args)
+
+
 class Key(BaseCommand):
     def __init__(self):
         super().__init__()
@@ -279,6 +338,30 @@ class Key(BaseCommand):
             return self.execute('RESTORE', *args, shard_key=args[0])
         return self.execute('RESTORE', *args)
 
+    def scan(self, *args, shard_key=None, sock=None):
+        """ Execute SCAN Command, consult Redis documentation for details.
+
+        :param shard_key: (optional)
+            Should be set to the key name you try to work with.
+            Can not be used if sock is set.
+
+            Only used if used with a Cluster Client
+        :type shard_key: string
+
+        :param sock: (optional)
+            The string representation of a socket, the command should be executed against.
+            For example: "testhost_6379"
+            Can not be used if shard_key is set.
+
+            Only used if used with a Cluster Client
+        :type sock: string
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('SCAN', *args, shard_key=shard_key, sock=sock)
+        return self.execute('SCAN', *args)
+
     def sort(self, *args):
         """ Execute SORT Command, consult Redis documentation for details.
 
@@ -306,29 +389,14 @@ class Key(BaseCommand):
             return self.execute('TYPE', *args, shard_key=args[0])
         return self.execute('TYPE', *args)
 
-    def scan(self, *args, shard_key=None, sock=None):
-        """ Execute SCAN Command, consult Redis documentation for details.
-
-        :param shard_key: (optional)
-            Should be set to the key name you try to work with.
-            Can not be used if sock is set.
-
-            Only used if used with a Cluster Client
-        :type shard_key: string
-
-        :param sock: (optional)
-            The string representation of a socket, the command should be executed against.
-            For example: "testhost_6379"
-            Can not be used if shard_key is set.
-
-            Only used if used with a Cluster Client
-        :type sock: string
+    def wait(self, *args):
+        """ Execute WAIT Command, consult Redis documentation for details.
 
         :return: result, exception
         """
         if self._cluster:
-            return self.execute('SCAN', *args, shard_key=shard_key, sock=sock)
-        return self.execute('SCAN', *args)
+            return self.execute('WAIT', *args, shard_key=args[0])
+        return self.execute('WAIT', *args)
 
 
 class String(BaseCommand):
@@ -352,6 +420,15 @@ class String(BaseCommand):
         if self._cluster:
             return self.execute('BITCOUNT', *args, shard_key=args[0])
         return self.execute('BITCOUNT', *args)
+
+    def bitfield(self, *args):
+        """ Execute BITFIELD Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('BITFIELD', *args, shard_key=args[0])
+        return self.execute('BITFIELD', *args)
 
     def bitop(self, *args):
         """ Execute BITOP Command, consult Redis documentation for details.
@@ -654,6 +731,15 @@ class Hash(BaseCommand):
         if self._cluster:
             return self.execute('HSETNX', *args, shard_key=args[0])
         return self.execute('HSETNX', *args)
+
+    def hstrlen(self, *args):
+        """ Execute HSTRLEN Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('HSTRLEN', *args, shard_key=args[0])
+        return self.execute('HSTRLEN', *args)
 
     def hvals(self, *args):
         """ Execute HVALS Command, consult Redis documentation for details.
@@ -1111,6 +1197,15 @@ class SSet(BaseCommand):
             return self.execute('ZREVRANGE', *args, shard_key=args[0])
         return self.execute('ZREVRANGE', *args)
 
+    def zrevrangebylex(self, *args):
+        """ Execute ZREVRANGEBYLEX Command, consult Redis documentation for details.
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('ZREVRANGEBYLEX', *args, shard_key=args[0])
+        return self.execute('ZREVRANGEBYLEX', *args)
+
     def zrevrangebyscore(self, *args):
         """ Execute ZREVRANGEBYSCORE Command, consult Redis documentation for details.
 
@@ -1337,6 +1432,30 @@ class Scripting(BaseCommand):
         if self._cluster:
             return self.execute('EVALSHA', *args, shard_key=shard_key, sock=sock)
         return self.execute('EVALSHA', *args)
+
+    def script_debug(self, *args, shard_key=None, sock=None):
+        """ Execute SCRIPT DEBUG Command, consult Redis documentation for details.
+
+        :param shard_key: (optional)
+            Should be set to the key name you try to work with.
+            Can not be used if sock is set.
+
+            Only used if used with a Cluster Client
+        :type shard_key: string
+
+        :param sock: (optional)
+            The string representation of a socket, the command should be executed against.
+            For example: "testhost_6379"
+            Can not be used if shard_key is set.
+
+            Only used if used with a Cluster Client
+        :type sock: string
+
+        :return: result, exception
+        """
+        if self._cluster:
+            return self.execute('SCRIPT', 'DEBUG', *args, shard_key=shard_key, sock=sock)
+        return self.execute('SCRIPT', 'DEBUG', *args)
 
     def script_exists(self, *args, shard_key=None, sock=None):
         """ Execute SCRIPT EXISTS Command, consult Redis documentation for details.
