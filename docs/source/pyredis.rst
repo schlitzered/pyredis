@@ -80,7 +80,7 @@ HyperLogLog
 -----------
 
 .. autoclass:: pyredis.commands.HyperLogLog
-:members:
+   :members:
 
 Geo
 ---
