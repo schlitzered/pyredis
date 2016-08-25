@@ -67,7 +67,7 @@ Using a Cluster Connection Pool
 
     from pyredis import ClusterPool
 
-    pool = ClusterPool(seeds=[('seed1', 6379), ('seed2', 6379), ('seed3', 6379)])
+    pool = ClusterPool(seeds=[('seed1', 6379), ('seed2', 6379), ('seed3', 6379)], name=cluster_name)
     client = pool.aquire()
     client.ping(shard_key='test')
     b'PONG'
@@ -80,12 +80,22 @@ Using a Sentinel backed Connection Pool
 
     from pyredis import SentinelPool
 
-    pool = SentinelPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)])
+    pool = SentinelPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)], name=pool_name)
     client = pool.aquire()
     client.ping()
     b'PONG'
     pool.release(client)
 
+
+Getting Pool by URL
+-------------------
+.. code:: python
+
+    from pyredis get_by_url
+    pool1 = get_by_url('redis://localhost?password=topsecret')
+    pool1 = get_by_url('redis://localhost:6379?db=0&password=topsecret')
+    sentinel = get_by_url('sentinel://seed1:6379,seed2,seed3:4711?name=pool_name&db=0&password=topsecret')
+    cluster = get_by_url('redis://seed1:6379,seed2:4711,seed3?db=0')
 
 Publish Subscribe
 -----------------

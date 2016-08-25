@@ -3,6 +3,7 @@ __author__ = 'schlitzer'
 
 __all__ = [
     'PyRedisError',
+    'PyRedisURLError',
     'PyRedisConnError',
     'PyRedisConnClosed',
     'PyRedisConnReadTimeout',
@@ -12,6 +13,10 @@ __all__ = [
 
 
 class PyRedisError(Exception):
+    pass
+
+
+class PyRedisURLError(PyRedisError):
     pass
 
 

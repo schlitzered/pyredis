@@ -8,6 +8,40 @@ from pyredis.exceptions import *
 from pyredis.helper import ClusterMap
 
 
+def get_by_url(url):
+    scheme, rest = url.split('://', 1)
+    conns = list()
+    kwargs = dict()
+    if '?' in rest:
+        connect, opts = (rest.split('?', 1))
+    else:
+        connect = rest
+        opts = None
+    for conn in connect.split(","):
+        conns.append(tuple(conn.rsplit(':', 1)))
+    if opts:
+        kwargs = dict()
+        for opt in opts.split('&'):
+            key, value = opt.split('=', 1)
+            kwargs[key] = value
+    try:
+        if scheme == "cluster":
+            return ClusterPool(seeds=conns, **kwargs)
+        elif scheme == "redis":
+            host = conns[0][0]
+            try:
+                port = conns[0][1]
+            except IndexError:
+                port = None
+            return Pool(host=host, port=port, **kwargs)
+        elif scheme == "sentinel":
+            return SentinelPool(sentinels=conns, **kwargs)
+        else:
+            raise PyRedisURLError("invalid schema: {0}")
+    except TypeError as err:
+        raise PyRedisURLError("unexpected or missing options specified: {0}".format(err))
+
+
 class BasePool(object):
     """ Base Class for all other pools.
 

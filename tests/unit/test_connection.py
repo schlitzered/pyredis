@@ -236,8 +236,6 @@ class TestConnectionUnit(TestCase):
         self.assertEqual(connection._reader, reader_mock)
         self.assertIsNone(connection._encoding)
         self.reader_mock.assert_called_with()
-        connection._authenticate.assertcalledwith()
-        connection._setdb.assertcalledwith()
 
     def test__connect_ipv4_encoding_utf_8(self):
         sock_mock = Mock()
@@ -255,8 +253,6 @@ class TestConnectionUnit(TestCase):
         self.assertEqual(connection._encoding, 'utf-8')
         self.assertEqual(connection._reader, reader_mock)
         self.reader_mock.assert_called_with(encoding='utf-8')
-        connection._authenticate.assertcalledwith()
-        connection._setdb.assertcalledwith()
 
     def test__connect_ipv6(self):
         sock_mock = Mock()
@@ -270,24 +266,6 @@ class TestConnectionUnit(TestCase):
         connection._connect()
 
         sock_mock.settimeout.assert_called_with(2)
-        connection._authenticate.assertcalledwith()
-        connection._setdb.assertcalledwith()
-
-    def test__connect_unix(self):
-        sock_mock = Mock()
-        self.socket_mock.socket.return_value = sock_mock
-        reader_mock = Mock()
-        self.reader_mock.return_value = reader_mock
-
-        connection = pyredis.connection.Connection(unix_sock='/tmp/test.sock')
-        connection._authenticate = Mock()
-        connection._setdb = Mock()
-        connection._connect()
-
-        sock_mock.settimeout.assert_called_with(2)
-        self.assertEqual(connection._sock, self.socket_mock.socket())
-        connection._authenticate.assertcalledwith()
-        connection._setdb.assertcalledwith()
 
     def test__close(self):
         sock_mock = Mock()

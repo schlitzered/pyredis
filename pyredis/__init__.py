@@ -10,9 +10,10 @@ License: MIT (see LICENSE for details)
 
 from pyredis.exceptions import *
 from pyredis.client import Client, ClusterClient, PubSubClient, SentinelClient
-from pyredis.pool import ClusterPool, Pool, SentinelPool
+from pyredis.pool import ClusterPool, Pool, SentinelPool, get_by_url
 
 __all__ = [
+    'get_by_url',
     'Client',
     'ClusterClient',
     'ClusterPool',
