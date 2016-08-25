@@ -18,12 +18,15 @@ def get_by_url(url):
         connect = rest
         opts = None
     for conn in connect.split(","):
-        conns.append(tuple(conn.rsplit(':', 1)))
+        conn = conn.rsplit(':', 1)
+        if len(conn) == 2:
+            conn[1] = int(conn[1])
+        conns.append(conn)
     if opts:
         kwargs = dict()
         for opt in opts.split('&'):
             key, value = opt.split('=', 1)
-            kwargs[key] = value
+            kwargs[key] = _opts_type_helper(key, value)
     try:
         if scheme == "cluster":
             return ClusterPool(seeds=conns, **kwargs)
@@ -32,7 +35,7 @@ def get_by_url(url):
             try:
                 port = conns[0][1]
             except IndexError:
-                port = None
+                port = 6379
             return Pool(host=host, port=port, **kwargs)
         elif scheme == "sentinel":
             return SentinelPool(sentinels=conns, **kwargs)
@@ -40,6 +43,20 @@ def get_by_url(url):
             raise PyRedisURLError("invalid schema: {0}")
     except TypeError as err:
         raise PyRedisURLError("unexpected or missing options specified: {0}".format(err))
+
+
+def _opts_type_helper(opt, value):
+    if opt in ['database', 'pool_size', 'retries']:
+        return int(value)
+    elif opt in ['conn_timeout', 'read_timeout']:
+        return float(value)
+    elif opt in ['slave_ok']:
+        if value in ['true', 'True', 1]:
+            return True
+        else:
+            return False
+    else:
+        return value
 
 
 class BasePool(object):
