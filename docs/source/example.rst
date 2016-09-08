@@ -91,11 +91,20 @@ Getting Pool by URL
 -------------------
 .. code:: python
 
-    from pyredis get_by_url
+    from pyredis import get_by_url
     pool1 = get_by_url('redis://localhost?password=topsecret')
     pool1 = get_by_url('redis://localhost:6379?db=0&password=topsecret')
     sentinel = get_by_url('sentinel://seed1:6379,seed2,seed3:4711?name=pool_name&db=0&password=topsecret')
     cluster = get_by_url('redis://seed1:6379,seed2:4711,seed3?db=0')
+
+
+Getting PubSubClient by URL
+---------------------------
+.. code:: python
+
+    from pyredis import get_by_url
+    # it is not save to share this client between threads
+    pubsub = get_by_url('pubsub://localhost?password=topsecret')
 
 Publish Subscribe
 -----------------
