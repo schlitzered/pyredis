@@ -451,10 +451,6 @@ class TestConnectionUnit(TestCase):
         self.assertEqual(result2, answer2)
         self.assertEqual(sock_mock.recv.call_args_list, [call(1500)])
 
-    def test_read_exception_not_connected(self):
-        connection = pyredis.connection.Connection(host='127.0.0.1', encoding='utf-8')
-        self.assertRaises(PyRedisConnError, connection.read)
-
     def test_read_exception_socket_timeout(self):
         sock_mock = Mock()
         sock_mock.recv.side_effect = [socket.timeout]

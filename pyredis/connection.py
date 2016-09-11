@@ -197,7 +197,7 @@ class Connection(object):
         :return: result, exception
         """
         if not self._sock:
-            raise PyRedisConnError('Not Connected')
+            self._connect()
         while True:
             result = self._reader.gets()
             if result is not False:
