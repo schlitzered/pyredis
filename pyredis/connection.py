@@ -129,7 +129,8 @@ class Connection(object):
             ConnectionAbortedError,
             ConnectionRefusedError,
             OverflowError,
-            socket.timeout
+            socket.timeout,
+            OSError
         ) as err:
             raise PyRedisConnError('Could not Connect to {0}:{1}: {2}'.format(
                 self.host,
@@ -147,7 +148,8 @@ class Connection(object):
             ConnectionAbortedError,
             ConnectionRefusedError,
             FileNotFoundError,
-            socket.timeout
+            socket.timeout,
+            OSError
         ) as err:
             raise PyRedisConnError('Could not Connect to {0}: {1}'.format(
                 self.host,
