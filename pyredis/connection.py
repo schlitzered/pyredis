@@ -132,6 +132,7 @@ class Connection(object):
             socket.timeout,
             OSError
         ) as err:
+            self.close()
             raise PyRedisConnError('Could not Connect to {0}:{1}: {2}'.format(
                 self.host,
                 self.port,
@@ -151,6 +152,7 @@ class Connection(object):
             socket.timeout,
             OSError
         ) as err:
+            self.close()
             raise PyRedisConnError('Could not Connect to {0}: {1}'.format(
                 self.host,
                 err
