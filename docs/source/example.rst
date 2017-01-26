@@ -67,7 +67,7 @@ Using a Cluster Connection Pool
 
     from pyredis import ClusterPool
 
-    pool = ClusterPool(seeds=[('seed1', 6379), ('seed2', 6379), ('seed3', 6379)], name=cluster_name)
+    pool = ClusterPool(seeds=[('seed1', 6379), ('seed2', 6379), ('seed3', 6379)])
     client = pool.aquire()
     client.ping(shard_key='test')
     b'PONG'

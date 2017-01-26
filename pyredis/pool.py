@@ -1,5 +1,3 @@
-__author__ = 'schlitzer'
-
 from random import shuffle
 import threading
 from pyredis import commands
@@ -107,7 +105,10 @@ class BasePool(object):
     @property
     def pool_size(self):
         """ Return, or adjust the current pool size.
-        Shrinking the pool is currently not implemented.
+
+        shrinking is implemented via closing unused connections.
+        if there not enough unused connections to fulfil the shrink request,
+        connections returned via pool.release are closed.
 
         :return: int, None
         """
@@ -115,7 +116,19 @@ class BasePool(object):
 
     @pool_size.setter
     def pool_size(self, size):
-        self._pool_size = size
+        try:
+            self._lock.acquire()
+            self._pool_size = size
+            current_size = len(self._pool_free) + len(self._pool_used)
+            while current_size > size:
+                try:
+                    client = self._pool_free.pop()
+                    client.close()
+                    current_size -= 1
+                except KeyError:
+                    break
+        finally:
+            self._lock.release()
 
     @property
     def close_on_err(self):
@@ -152,6 +165,7 @@ class BasePool(object):
         """
         try:
             self._lock.acquire()
+            current_size = len(self._pool_free) + len(self._pool_used)
             self._pool_used.remove(conn)
             if conn.closed and self.close_on_err:
                 for conn in self._pool_free:
@@ -159,7 +173,10 @@ class BasePool(object):
                 self._pool_free = set()
                 self._pool_used = set()
             elif not conn.closed:
-                self._pool_free.add(conn)
+                if current_size > self.pool_size:
+                    conn.close()
+                else:
+                    self._pool_free.add(conn)
         except KeyError:
             conn.close()
         finally:

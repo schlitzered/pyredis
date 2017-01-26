@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import Mock, MagicMock, PropertyMock, call, patch
 
 import pyredis.pool
+import pyredis.exceptions
 from pyredis.exceptions import *
 
 
@@ -74,7 +75,7 @@ class TestBasePoolUnit(TestCase):
 
         self.pool._lock = Mock()
 
-        self.assertRaises(pyredis.connection.PyRedisError, self.pool.acquire)
+        self.assertRaises(pyredis.exceptions.PyRedisError, self.pool.acquire)
 
         self.pool._lock.assert_has_calls([
             call.acquire(),
@@ -88,6 +89,19 @@ class TestBasePoolUnit(TestCase):
 
         self.pool.release(client)
         self.assertIn(client, self.pool._pool_free)
+        self.assertNotIn(client, self.pool._pool_used)
+
+    def test_release_shrink(self):
+        client = Mock()
+        client.closed = False
+        self.pool.pool_size = 3
+        self.pool._pool_used.add(client)
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_used.add(Mock())
+
+        self.pool.release(client)
+        self.assertNotIn(client, self.pool._pool_free)
         self.assertNotIn(client, self.pool._pool_used)
 
     def test_release_closed_without_pool_reset(self):
@@ -129,7 +143,36 @@ class TestBasePoolUnit(TestCase):
         self.assertIn(conn2, self.pool._pool_used)
         self.assertFalse(conn1.close.called)
         self.assertFalse(conn2.close.called)
-        conn_release.close.assert_called_with()
+
+    def test_shrink_pool_can_free_all(self):
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+
+        self.assertEquals(len(self.pool._pool_free), 5)
+        self.pool.pool_size = 3
+        self.assertEquals(len(self.pool._pool_free), 3)
+
+    def test_shrink_pool_can_free_all(self):
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+        self.pool._pool_free.add(Mock())
+
+        self.pool._pool_used.add(Mock())
+        self.pool._pool_used.add(Mock())
+        self.pool._pool_used.add(Mock())
+        self.pool._pool_used.add(Mock())
+        self.pool._pool_used.add(Mock())
+
+        self.assertEquals(len(self.pool._pool_free), 5)
+        self.assertEquals(len(self.pool._pool_used), 5)
+        self.pool.pool_size = 3
+        self.assertEquals(len(self.pool._pool_free), 0)
+        self.assertEquals(len(self.pool._pool_used), 5)
 
 
 class TestClusterPoolUnit(TestCase):

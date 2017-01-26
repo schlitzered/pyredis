@@ -105,7 +105,7 @@ class Connection(object):
             sock = self._connect_unix()
         self._sock = sock
         if self._encoding:
-            self._reader = Reader(encoding='utf-8')
+            self._reader = Reader(encoding=self._encoding)
         else:
             self._reader = Reader()
         if not self._sentinel:
@@ -124,7 +124,7 @@ class Connection(object):
                 sock.settimeout(self._conn_timeout)
                 sock.connect((self.host, self.port))
             except socket.gaierror:
-                raise PyRedisConnError('Host is nether a IPv4 or IPv6')
+                raise PyRedisConnError('Host is neither a IPv4 or IPv6 address')
         except (
             ConnectionAbortedError,
             ConnectionRefusedError,

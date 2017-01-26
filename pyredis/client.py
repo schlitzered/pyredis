@@ -1,5 +1,3 @@
-__author__ = 'schlitzer'
-
 from collections import deque
 
 from pyredis import commands
@@ -19,7 +17,7 @@ class Client(
     commands.Set,
     commands.SSet,
     commands.String,
-    commands.Transaction
+    commands.Transaction,
 ):
     """ Base Client for Talking to Redis.
 

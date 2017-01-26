@@ -1,5 +1,3 @@
-__author__ = 'schlitzer'
-
 import crc16
 import random
 from collections import deque
