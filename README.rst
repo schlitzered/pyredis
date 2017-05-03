@@ -1,7 +1,6 @@
 Introduction
 ************
-Redis Client implementation for Python.
-The Client only supports Python 3 for the moment.
+Redis Client implementation for Python. The Client only supports Python 3 for the moment.
 If there is enough interest, i will make it work with Python 2.
 
 Currently implemented Features:
@@ -11,22 +10,21 @@ Currently implemented Features:
   - Connection Pool
   - Sentinel Backed Connection Pool
   - Client & Pool for Redis Cluster
-  - Bulk Mode ( Not Supported with Redis Cluster )
+  - Bulk Mode ( Not supported with Redis Cluster )
+  - Client & Pool with Static Hash Cluster (Supports Bulk Mode)
 
 Planned Features:
-  - Python 2 support ( if there is enough interest )
+  - Sentinel Backed Client & Pool with Static Hash Cluster (will support Bulk Mode)
+  - Python 2 support ( If there is enough interest )
 
-
-Documentation
--------------
-
-http://pyredis.readthedocs.org/
 
 Installing
 ----------
 
 pyredis can be installed via pip as follows:
-::
+
+.. code::
+
     pip install python_redis
 
 Author
