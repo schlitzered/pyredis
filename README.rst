@@ -17,6 +17,11 @@ Planned Features:
   - Sentinel Backed Client & Pool with Static Hash Cluster (will support Bulk Mode)
   - Python 2 support ( If there is enough interest )
 
+Documentation
+-------------
+
+http://pyredis.readthedocs.org/
+
 
 Installing
 ----------
@@ -43,3 +48,5 @@ Contributing
 
 If you'd like to contribute, fork the project, make a patch and send a pull
 request.
+
+
