@@ -13,6 +13,7 @@ try:
 except ImportError:
     from pyredis.exceptions import ReplyError
 
+
 class TestClientUnit(TestCase):
     def setUp(self):
         self.addCleanup(patch.stopall)
@@ -145,7 +146,7 @@ class TestClientUnit(TestCase):
         self.assertIsNone(client._bulk_size)
         self.assertIsNone(client._bulk_size_current)
 
-    def test_bulk_stop(self):
+    def test_bulk_stop_not_in_bulk_mode(self):
         client = pyredis.client.Client(host='127.0.0.1')
         self.assertRaises(PyRedisError, client.bulk_stop)
 
@@ -167,6 +168,256 @@ class TestClientUnit(TestCase):
         client._bulk = True
         client.execute(b'PING')
         client._execute_bulk.assert_called_with(b'PING')
+
+
+class TestHashClientUnit(TestCase):
+    def setUp(self):
+        self.addCleanup(patch.stopall)
+
+        connection_patcher = patch('pyredis.client.Connection', autospec=True)
+        self.buckets = [('localhost', 7001), ('localhost', 7002), ('localhost', 7003)]
+        self.connection_mock = connection_patcher.start()
+
+    def test___init___args_host__conn(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+
+        self.assertEquals(client._conn_names, ['localhost_7001', 'localhost_7002', 'localhost_7003'])
+        self.connection_mock.assert_has_calls([
+            call(host='localhost', port=7001, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2),
+            call(host='localhost', port=7002, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2),
+            call(host='localhost', port=7003, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2)
+        ])
+        self.assertEquals(client._map[0], 'localhost_7001')
+        self.assertEquals(client._map[1], 'localhost_7002')
+        self.assertEquals(client._map[2], 'localhost_7003')
+        self.assertEquals(client._map[3], 'localhost_7001')
+        self.assertEquals(client._map[4], 'localhost_7002')
+        self.assertEquals(client._map[5], 'localhost_7003')
+
+    def test__bulk_fetch(self):
+        conn_mock_1 = Mock()
+        conn_mock_1.read.return_value = b'PONG1'
+        conn_mock_2 = Mock()
+        conn_mock_2.read.return_value = b'PONG2'
+        conn_mock_3 = Mock()
+        conn_mock_3.read.return_value = b'PONG3'
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client._bulk_keep = True
+        client._bulk_results = []
+        client._bulk_size_current = 3
+        client._bulk_bucket_order.append(conn_mock_1)
+        client._bulk_bucket_order.append(conn_mock_2)
+        client._bulk_bucket_order.append(conn_mock_3)
+
+        client._bulk_fetch()
+        conn_mock_1.read.assert_has_calls([
+            call(raise_on_result_err=False),
+        ])
+        conn_mock_2.read.assert_has_calls([
+            call(raise_on_result_err=False),
+        ])
+        conn_mock_3.read.assert_has_calls([
+            call(raise_on_result_err=False),
+        ])
+        self.assertEqual(client._bulk_results, [b'PONG1', b'PONG2', b'PONG3'])
+        self.assertEqual(client._bulk_size_current, 0)
+        self.assertEqual(client._bulk_bucket_order, [])
+
+    def test__execute_basic(self):
+        conn_mock_1 = Mock()
+        conn_mock_1.read.return_value = b'PONG1'
+        conn_mock_2 = Mock()
+        conn_mock_2.read.return_value = b'PONG2'
+        conn_mock_3 = Mock()
+        conn_mock_3.read.return_value = b'PONG3'
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+
+        result = client._execute_basic('Ping', conn=conn_mock_1)
+        conn_mock_1.write.assert_called_with('Ping')
+        conn_mock_1.read.assert_called_with()
+        self.assertEqual(result, b'PONG1')
+
+    def test__execute_bulk_bulk_size_not_reached(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client.bulk_start()
+        result = client._execute_bulk('Ping', conn=conn_mock_1)
+        conn_mock_1.write.assert_called_with('Ping')
+        self.assertIsNone(result)
+
+    def test__execute_bulk_bulk_size_reached(self):
+        conn_mock_1 = Mock()
+        conn_mock_1.read.return_value = b'PONG1'
+        conn_mock_2 = Mock()
+        conn_mock_2.read.return_value = b'PONG2'
+        conn_mock_3 = Mock()
+        conn_mock_3.read.return_value = b'PONG3'
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client.bulk_start(3)
+        result = client._execute_bulk('Ping', conn=conn_mock_1)
+        self.assertIsNone(result)
+        self.assertEqual(client._bulk_size_current, 1)
+        self.assertEqual(client._bulk_results, [])
+        result = client._execute_bulk('Ping', conn=conn_mock_2)
+        self.assertIsNone(result)
+        self.assertEqual(client._bulk_size_current, 2)
+        self.assertEqual(client._bulk_results, [])
+        result = client._execute_bulk('Ping', conn=conn_mock_3)
+        self.assertIsNone(result)
+        self.assertEqual(client._bulk_size_current, 0)
+        self.assertEqual(client._bulk_results, [b'PONG1', b'PONG2', b'PONG3'])
+
+    def test_execute_non_bulk_shard_key(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        print(client._conns)
+        client._execute_basic = Mock()
+        client._execute_basic.return_value = b'PONG'
+
+        result = client.execute('Ping', shard_key='blarg')
+        client._execute_basic.assert_called_with('Ping', conn=conn_mock_3)
+        self.assertEqual(result, b'PONG')
+
+    def test_bulk(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        self.assertEqual(client.bulk, client._bulk)
+
+    def test_bulk_start(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client.bulk_start()
+        self.assertTrue(client.bulk)
+        self.assertEqual(client._bulk_size, 5000)
+        self.assertEqual(client._bulk_size_current, 0)
+        self.assertEqual(client._bulk_results, [])
+        self.assertTrue(client._bulk_keep)
+
+    def test_bulk_start_no_keep_results(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client.bulk_start(keep_results=False)
+        self.assertTrue(client.bulk)
+        self.assertEqual(client._bulk_size, 5000)
+        self.assertEqual(client._bulk_size_current, 0)
+        self.assertIsNone(client._bulk_results)
+        self.assertFalse(client._bulk_keep)
+
+    def test_bulk_start_bulk_size_42(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client.bulk_start(bulk_size=42)
+        self.assertTrue(client.bulk)
+        self.assertEqual(client._bulk_size, 42)
+        self.assertEqual(client._bulk_size_current, 0)
+
+    def test_bulk_start_raise_already_open(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client.bulk_start()
+        self.assertRaises(PyRedisError, client.bulk_start)
+
+    def test_bulk_stop(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client._bulk_fetch = Mock()
+        client._bulk = True
+        client._bulk_results = [b'PONG']
+        result = client.bulk_stop()
+        client._bulk_fetch.assert_called_with()
+        self.assertEqual(result, [b'PONG'])
+        self.assertFalse(client._bulk)
+        self.assertFalse(client._bulk_keep)
+        self.assertIsNone(client._bulk_results)
+        self.assertIsNone(client._bulk_size)
+        self.assertIsNone(client._bulk_size_current)
+
+    def test_bulk_stop_not_in_bulk_mode(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        self.assertRaises(PyRedisError, client.bulk_stop)
+
+    def test_close(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client.close()
+        self.assertTrue(client.closed)
+
+    def test_execute(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client._execute_basic = Mock()
+        client._execute_basic.return_value = b'PONG'
+        result = client.execute(b'PING', shard_key='blarg')
+        client._execute_basic.assert_called_with(b'PING', conn=conn_mock_3)
+        self.assertEqual(result, b'PONG')
+
+    def test_execute_bulk(self):
+        conn_mock_1 = Mock()
+        conn_mock_2 = Mock()
+        conn_mock_3 = Mock()
+        self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
+
+        client = pyredis.client.HashClient(buckets=self.buckets)
+        client._execute_bulk = Mock()
+        client._bulk = True
+        client.execute(b'PING', shard_key='blarg')
+        client._execute_bulk.assert_called_with(b'PING', conn=conn_mock_3)
 
 
 class TestPubSubClientUnit(TestCase):
@@ -430,7 +681,7 @@ class TestClusterClientUnit(TestCase):
         self.assertEqual(client._map, map)
         self.assertEqual(client._map_id, map.id)
 
-    def test___init__map(self):
+    def test___init__map_and_seeds(self):
         map = Mock()
         self.assertRaises(
             PyRedisError,

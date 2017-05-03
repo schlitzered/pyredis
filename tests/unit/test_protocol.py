@@ -253,7 +253,7 @@ class ReaderTest(TestCase):
             self.assertEquals(b'ok', self.reply())
 
 
-class Testwriter(TestCase):
+class TestWriter(TestCase):
     def test_encode_0_args(self):
         expected = b'*0\r\n'
         self.assertEqual(
@@ -279,7 +279,7 @@ class Testwriter(TestCase):
             expected)
 
 
-class Testto_bytes(TestCase):
+class TestToBytes(TestCase):
     def test_int(self):
         expected = b'512'
         result = to_bytes(512)

@@ -155,7 +155,7 @@ class TestBasePoolUnit(TestCase):
         self.pool.pool_size = 3
         self.assertEquals(len(self.pool._pool_free), 3)
 
-    def test_shrink_pool_can_free_all(self):
+    def test_shrink_pool_can_not_free_all(self):
         self.pool._pool_free.add(Mock())
         self.pool._pool_free.add(Mock())
         self.pool._pool_free.add(Mock())
@@ -215,6 +215,34 @@ class TestClusterPoolUnit(TestCase):
             slave_ok=False,
             database=0)
         self.assertEqual(self.client_mock_inst, client)
+
+
+class TestHashPoolUnit(TestCase):
+    def setUp(self):
+        client_patcher = patch('pyredis.pool.HashClient', autospeck=True)
+        self.client_mock = client_patcher.start()
+        self.addCleanup(patch.stopall)
+        self.buckets = [('localhost', 7001), ('localhost', 7002), ('localhost', 7003)]
+
+        self.pool = pyredis.pool.HashPool(buckets=self.buckets)
+
+    def test___init__(self):
+        self.assertEqual(self.pool.buckets, self.buckets)
+        self.assertTrue(self.pool._cluster)
+
+    def test__connect(self):
+        client_mock = Mock()
+        self.client_mock.return_value = client_mock
+        client = self.pool._connect()
+        self.client_mock.assert_called_with(
+            buckets=self.pool.buckets,
+            database=self.pool.database,
+            password=self.pool.password,
+            encoding=self.pool.encoding,
+            conn_timeout=self.pool.conn_timeout,
+            read_timeout=self.pool.read_timeout
+        )
+        self.assertEqual(client, client_mock)
 
 
 class TestPoolUnit(TestCase):

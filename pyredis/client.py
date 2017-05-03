@@ -3,7 +3,7 @@ from collections import deque
 from pyredis import commands
 from pyredis.connection import Connection
 from pyredis.exceptions import PyRedisError, PyRedisConnError, PyRedisConnReadTimeout, ReplyError
-from pyredis.helper import dict_from_list, ClusterMap
+from pyredis.helper import dict_from_list, ClusterMap, slot_from_key
 
 
 class Client(
@@ -217,7 +217,7 @@ class ClusterClient(
         if not bool(seeds) != bool(cluster_map):
             raise PyRedisError('Ether seeds or cluster_map has to be provided')
         self._cluster = True
-        self._conns = {}
+        self._conns = dict()
         self._conn_timeout = conn_timeout
         self._read_timeout = read_timeout
         self._encoding = encoding
@@ -318,6 +318,212 @@ class ClusterClient(
             self._conns[sock].close()
             del self._conns[sock]
             self._map.update(self._map_id)
+            raise err
+
+
+class HashClient(
+    commands.Connection,
+    commands.Hash,
+    commands.HyperLogLog,
+    commands.Key,
+    commands.List,
+    commands.Publish,
+    commands.Scripting,
+    commands.Set,
+    commands.SSet,
+    commands.String,
+    commands.Transaction,
+):
+    """ Client for Talking to Static Hashed Redis Cluster.
+    
+    The Client will calculate a crc16 hash using the shard_key,
+    which is be default the first Key in case the command supports multiple keys.
+    If the Key is using the TAG annotation "bla{tag}blarg",
+    then only the tag portion is used, in this case "tag".
+    The key space is split into 16384 buckets, so in theory you could provide
+    a list with 16384 ('host', port) pairs to the "buckets" parameter.
+    If you have less then 16384 ('host', port) pairs, the client will try to
+    distribute the key spaces evenly between available pairs.
+    
+    --- Warning ---
+    Since this is static hashing, the the order of pairs has to match on each client you use!
+    Also changing the number of pairs will change the mapping between buckets and pairs,
+    rendering your data inaccessible!
+
+    Inherits the following Commmand classes:
+      - commands.Connection,
+      - commands.Hash,
+      - commands.HyperLogLog,
+      - commands.Key,
+      - commands.List,
+      - commands.Publish,
+      - commands.Scripting,
+      - commands.Set,
+      - commands.SSet,
+      - commands.String,
+      - commands.Transaction
+    """
+    def __init__(self, buckets, database=0, password=None, encoding=None, conn_timeout=2, read_timeout=2):
+
+        super().__init__()
+        self._conns = dict()
+        self._conn_names = list()
+        self._bulk = False
+        self._bulk_keep = False
+        self._bulk_results = None
+        self._bulk_size = None
+        self._bulk_size_current = None
+        self._bulk_bucket_order = list()
+        self._closed = False
+        self._cluster = True
+        self._map = dict()
+        self._init_conns(buckets, database, password, encoding, conn_timeout, read_timeout)
+        self._init_map()
+
+    def _bulk_fetch(self):
+        for conn in self._bulk_bucket_order:
+            result = conn.read(raise_on_result_err=False)
+            if self._bulk_keep:
+                self._bulk_results.append(result)
+        self._bulk_bucket_order = list()
+        self._bulk_size_current = 0
+
+    @staticmethod
+    def _execute_basic(*args, conn):
+        conn.write(*args)
+        return conn.read()
+
+    def _execute_bulk(self, *args, conn):
+        conn.write(*args)
+        self._bulk_size_current += 1
+        self._bulk_bucket_order.append(conn)
+        if self._bulk_size_current == self._bulk_size:
+            self._bulk_fetch()
+
+    def _init_conns(self, buckets, database, password, encoding, conn_timeout, read_timeout):
+        for bucket in buckets:
+            host, port = bucket
+            bucketname = '{0}_{1}'.format(host, port)
+            self._conn_names.append(bucketname)
+            self._conns[bucketname] = Connection(
+                host=host, port=port, database=database, password=password,
+                encoding=encoding, conn_timeout=conn_timeout, read_timeout=read_timeout
+            )
+
+    def _init_map(self):
+        num_buckets = len(self._conn_names) - 1
+        cur_bucket = 0
+        for slot in range(16384):
+            self._map[slot] = self._conn_names[cur_bucket]
+            if cur_bucket == num_buckets:
+                cur_bucket = 0
+            else:
+                cur_bucket += 1
+
+    @property
+    def bulk(self):
+        """ True if bulk mode is enabled.
+
+        :return: bool
+        """
+        return self._bulk
+
+    def bulk_start(self, bulk_size=5000, keep_results=True):
+        """ Enable bulk mode
+
+        Put the client into bulk mode. Instead of executing a command & waiting for
+        the reply, all commands are send to Redis without fetching the result.
+        The results get fetched whenever $bulk_size commands have been executed,
+        which will also resets the counter, or of bulk_stop() is called.
+
+        :param bulk_size:
+            Number of commands to execute, before fetching results.
+        :type bulk_size: int
+
+        :param keep_results:
+            If True, keep the results. The Results will be returned when calling bulk_stop.
+        :type keep_results: bool
+
+        :return: None
+        """
+        if self.bulk:
+            raise PyRedisError("Already in bulk mode")
+        self._bulk = True
+        self._bulk_size = bulk_size
+        self._bulk_size_current = 0
+        if keep_results:
+            self._bulk_results = []
+            self._bulk_keep = True
+
+    def bulk_stop(self):
+        """ Stop bulk mode.
+
+        All outstanding results from previous commands get fetched.
+        If bulk_start was called with keep_results=True, return a list with all
+        results from the executed commands in order. The list of results can also contain
+        Exceptions, hat you should check for.
+
+        :return: None, list
+        """
+        if not self.bulk:
+            raise PyRedisError("Not in bulk mode")
+        self._bulk_fetch()
+        results = self._bulk_results
+        self._bulk = False
+        self._bulk_keep = False
+        self._bulk_results = None
+        self._bulk_size = None
+        self._bulk_size_current = None
+        return results
+
+    def close(self):
+        """ Close client.
+
+        :return: None
+        """
+        for conn in self._conns.values():
+            conn.close()
+        self._closed = True
+
+    @property
+    def closed(self):
+        """ Check if client is closed.
+
+        :return: bool
+        """
+        return self._closed
+
+    def execute(self, *args, shard_key=None, sock=None):
+        """ Execute arbitrary redis command.
+
+        :param args:
+        :type args: list, int, float
+
+        :param shard_key: (optional)
+            Should be set to the key name you try to work with.
+            Can not be used if sock is set.
+        :type shard_key: string
+
+        :param sock: (optional)
+            The string representation of a socket, the command should be executed against.
+            For example: "testhost_6379"
+            Can not be used if shard_key is set.
+        :type sock: string
+
+        :return: result, exception
+        """
+        if not bool(shard_key) != bool(sock):
+            raise PyRedisError('Ether shard_key or sock has to be provided')
+        if not sock:
+            sock = self._map[slot_from_key(shard_key)]
+        conn = self._conns[sock]
+        try:
+            if not self._bulk:
+                return self._execute_basic(conn=conn, *args)
+            else:
+                self._execute_bulk(conn=conn, *args)
+        except PyRedisConnError as err:
+            self.close()
             raise err
 
 

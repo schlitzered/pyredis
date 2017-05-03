@@ -41,9 +41,20 @@ commands.
 
     client = Client(host="localhost")
     client.bulk_start()
-    client.set('key1', 'value1)
-    client.set('key1', 'value1)
-    client.set('key1', 'value1)
+    client.set('key1', 'value1')
+    client.set('key2', 'value2')
+    client.set('key3', 'value3')
+    client.bulk_stop()
+    [b'OK', b'OK', b'OK']
+
+
+    from pyredis import HashClient
+
+    client = Client(buckets=[('host1', 6379), ('host2', 6379), ('host3', 6379)])
+    client.bulk_start()
+    client.set('key1', 'value1')
+    client.set('key2', 'value2')
+    client.set('key3', 'value3')
     client.bulk_stop()
     [b'OK', b'OK', b'OK']
 
@@ -68,6 +79,19 @@ Using a Cluster Connection Pool
     from pyredis import ClusterPool
 
     pool = ClusterPool(seeds=[('seed1', 6379), ('seed2', 6379), ('seed3', 6379)])
+    client = pool.aquire()
+    client.ping(shard_key='test')
+    b'PONG'
+    pool.release(client)
+
+
+Using a Hash Connection Pool
+----------------------------
+.. code:: python
+
+    from pyredis import HashPool
+
+    pool = HashPool(buckets=[('host1', 6379), ('host2', 6379), ('host3', 6379)])
     client = pool.aquire()
     client.ping(shard_key='test')
     b'PONG'

@@ -1,7 +1,7 @@
 from random import shuffle
 import threading
 from pyredis import commands
-from pyredis.client import Client, ClusterClient, SentinelClient
+from pyredis.client import Client, ClusterClient, HashClient, SentinelClient
 from pyredis.exceptions import *
 from pyredis.helper import ClusterMap
 
@@ -236,6 +236,81 @@ class ClusterPool(
             conn_timeout=self.conn_timeout,
             read_timeout=self.read_timeout,
             cluster_map=self._map
+        )
+
+    def execute(self, *args, **kwargs):
+        """ Execute arbitrary redis command.
+
+        :param args:
+        :type args: list, int, float
+
+        :return: result, exception
+        """
+        conn = self.acquire()
+        try:
+            return conn.execute(*args, **kwargs)
+        finally:
+            self.release(conn)
+
+
+class HashPool(
+    BasePool,
+    commands.Connection,
+    commands.Hash,
+    commands.HyperLogLog,
+    commands.Key,
+    commands.List,
+    commands.Publish,
+    commands.Scripting,
+    commands.Set,
+    commands.SSet,
+    commands.String,
+):
+    """ Pool for straight connections to Redis
+
+    Inherits all the arguments, methods and attributes from BasePool.
+    
+    The Client will calculate a crc16 hash using the shard_key,
+    which is be default the first Key in case the command supports multiple keys.
+    If the Key is using the TAG annotation "bla{tag}blarg",
+    then only the tag portion is used, in this case "tag".
+    The key space is split into 16384 buckets, so in theory you could provide
+    a list with 16384 ('host', port) pairs to the "buckets" parameter.
+    If you have less then 16384 ('host', port) pairs, the client will try to
+    distribute the key spaces evenly between available pairs.
+    
+    --- Warning ---
+    Since this is static hashing, the the order of pairs has to match on each client you use!
+    Also changing the number of pairs will change the mapping between buckets and pairs,
+    rendering your data inaccessible!
+
+
+    :param buckets:
+        list of ('host', port) pairs, where each pair represents a bucket
+        example: [('localhost', 7001), ('localhost', 7002), ('localhost', 7003)]
+    :type port: list
+    """
+    def __init__(self, buckets, **kwargs):
+        super().__init__(**kwargs)
+        self._buckets = buckets
+        self._cluster = True
+
+    @property
+    def buckets(self):
+        """ Return configured buckets.
+
+        :return: list
+        """
+        return self._buckets
+
+    def _connect(self):
+        return HashClient(
+            buckets=self.buckets,
+            database=self.database,
+            password=self.password,
+            encoding=self.encoding,
+            conn_timeout=self.conn_timeout,
+            read_timeout=self.read_timeout
         )
 
     def execute(self, *args, **kwargs):

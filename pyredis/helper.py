@@ -34,7 +34,7 @@ def tag_from_key(key):
 
 
 def slot_from_key(key):
-    return crc16.crc16xmodem(key) % 16384
+    return crc16.crc16xmodem(tag_from_key(key)) % 16384
 
 
 class ClusterMap(object):
@@ -72,9 +72,9 @@ class ClusterMap(object):
 
     def get_slot(self, shard_key, slave=None):
         if not slave:
-            return self._map[slot_from_key(tag_from_key(shard_key))]['master']
+            return self._map[slot_from_key(shard_key)]['master']
         else:
-            return self._map[slot_from_key(tag_from_key(shard_key))]['slave']
+            return self._map[slot_from_key(shard_key)]['slave']
 
     def hosts(self, slave=None):
         result = set()

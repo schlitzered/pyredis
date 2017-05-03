@@ -22,6 +22,12 @@ ClusterClient
 .. autoclass:: pyredis.ClusterClient
     :members:
 
+HashClient
+----------
+
+.. autoclass:: pyredis.HashClient
+    :members:
+
 PubSubClient
 ------------
 
@@ -47,6 +53,12 @@ ClusterPool
 -----------
 
 .. autoclass:: pyredis.ClusterPool
+    :members:
+
+HashPool
+--------
+
+.. autoclass:: pyredis.HashPool
     :members:
 
 Pool
