@@ -98,6 +98,19 @@ Using a Hash Connection Pool
     pool.release(client)
 
 
+Using a Sentinel backed Connection Hash Pool
+--------------------------------------------
+.. code:: python
+
+    from pyredis import SentinelHashPool
+
+    pool = SentinelPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)], buckets=['bucket1', 'bucket2', 'bucket3*])
+    client = pool.aquire()
+    client.ping()
+    b'PONG'
+    pool.release(client)
+
+
 Using a Sentinel backed Connection Pool
 ---------------------------------------
 .. code:: python

@@ -12,10 +12,7 @@ Currently implemented Features:
   - Client & Pool for Redis Cluster
   - Bulk Mode ( Not supported with Redis Cluster )
   - Client & Pool with Static Hash Cluster (Supports Bulk Mode)
-
-Planned Features:
-  - Sentinel Backed Client & Pool with Static Hash Cluster (will support Bulk Mode)
-  - Python 2 support ( If there is enough interest )
+  - Sentinel Backed Client & Pool with Static Hash Cluster (Supports Bulk Mode)
 
 
 Installing

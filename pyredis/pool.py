@@ -419,6 +419,179 @@ class Pool(
             self.release(conn)
 
 
+class SentinelHashPool(
+    BasePool,
+    commands.Connection,
+    commands.Hash,
+    commands.HyperLogLog,
+    commands.Key,
+    commands.List,
+    commands.Publish,
+    commands.Scripting,
+    commands.Set,
+    commands.SSet,
+    commands.String,
+):
+    """ Sentinel backed Pool.
+
+    Inherits all the arguments, methods and attributes from BasePool.
+
+    :param sentinels:
+        Accepts a list of sentinels in this form: [('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)]
+    :type sentinels: list
+
+    :param buckets:
+        list of Sentinel managed replications sets which make up this HashPool
+    :type name: list
+
+    :param slave_ok:
+        Defaults to False. If True, this pool will return connections to slave instances.
+    :type slave_ok: bool
+
+    :param retries:
+        In case a sentinel delivers stale data, how many other sentinels should be tried.
+    :type retries: int
+    """
+    def __init__(self, sentinels, buckets, slave_ok=False, retries=3, **kwargs):
+        super().__init__(**kwargs)
+        self._sentinel = SentinelClient(sentinels=sentinels)
+        self._buckets = buckets
+        self._slave_ok = slave_ok
+        self._retries = retries
+        self._close_on_err = True
+        self._cluster = True
+
+    @property
+    def slave_ok(self):
+        """ True if this pool return slave connections
+
+        :return: bool
+        """
+        return self._slave_ok
+
+    @property
+    def buckets(self):
+        """ Name of the configured Sentinel managed cluster.
+
+        :return: str
+        """
+        return self._buckets
+
+    @property
+    def retries(self):
+        """ Number of retries in case of stale sentinel.
+
+        :return: int
+        """
+        return self._retries
+
+    @property
+    def sentinels(self):
+        """ Deque with configured sentinels.
+
+        :return: deque
+        """
+        return self._sentinel.sentinels
+
+    def _connect(self):
+        if self.slave_ok:
+            client = self._get_slaves()
+        else:
+            client = self._get_masters()
+        if client:
+            return client
+
+    def _get_client(self, host, port):
+        return Client(
+            host=host,
+            port=port,
+            database=self.database,
+            password=self.password,
+            encoding=self.encoding,
+            conn_timeout=self.conn_timeout,
+            read_timeout=self.read_timeout
+        )
+
+    def _get_hash_client(self, buckets):
+        return HashClient(
+            buckets=buckets,
+            database=self.database,
+            password=self.password,
+            encoding=self.encoding,
+            conn_timeout=self.conn_timeout,
+            read_timeout=self.read_timeout
+        )
+
+    def _get_master(self, bucket):
+        candidate = self._sentinel.get_master(bucket)
+        host = candidate[b'ip'].decode('utf8')
+        port = int(candidate[b'port'])
+        client = self._get_client(host, port)
+        state = client.execute('INFO', 'replication')
+        client.close()
+        if b'role:master' in state:
+            return host, port
+        else:
+            self._sentinel.next_sentinel()
+
+    def _get_masters(self):
+        buckets = list()
+        for bucket in self.buckets:
+            _counter = self.retries
+            while _counter >= 0:
+                _counter -= 1
+                _bucket = self._get_master(bucket)
+                if _bucket:
+                    buckets.append(_bucket)
+                    break
+                if _counter == 0:
+                    raise PyRedisConnError("Could not connect to bucket {0}".format(bucket))
+        return self._get_hash_client(buckets=buckets)
+
+    def _get_slave(self, bucket):
+        candidates = []
+        for candidate in self._sentinel.get_slaves(bucket):
+            candidates.append((candidate[b'ip'], int(candidate[b'port'])))
+        shuffle(candidates)
+        for candidate in candidates:
+            host = candidate[0].decode('utf8')
+            port = candidate[1]
+            client = self._get_client(host, port)
+            state = client.execute('INFO', 'replication')
+            client.close()
+            if b'role:slave' in state:
+                return host, port
+        self._sentinel.next_sentinel()
+
+    def _get_slaves(self):
+        buckets = list()
+        for bucket in self.buckets:
+            _counter = self.retries
+            while _counter >= 0:
+                _counter -= 1
+                _bucket = self._get_slave(bucket)
+                if _bucket:
+                    buckets.append(_bucket)
+                    break
+                if _counter == 0:
+                    raise PyRedisConnError("Could not connect to bucket {0}".format(bucket))
+        return self._get_hash_client(buckets=buckets)
+
+    def execute(self, *args, **kwargs):
+        """ Execute arbitrary redis command.
+
+        :param args:
+        :type args: list, int, float
+
+        :return: result, exception
+        """
+        conn = self.acquire()
+        try:
+            return conn.execute(*args, **kwargs)
+        finally:
+            self.release(conn)
+
+
 class SentinelPool(
     BasePool,
     commands.Connection,

@@ -67,6 +67,12 @@ Pool
 .. autoclass:: pyredis.Pool
     :members:
 
+SentinelHashPool
+----------------
+
+.. autoclass:: pyredis.SentinelPool
+    :members:
+
 SentinelPool
 ------------
 
