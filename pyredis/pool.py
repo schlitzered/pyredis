@@ -526,13 +526,7 @@ class SentinelHashPool(
         candidate = self._sentinel.get_master(bucket)
         host = candidate[b'ip'].decode('utf8')
         port = int(candidate[b'port'])
-        client = self._get_client(host, port)
-        state = client.execute('INFO', 'replication')
-        client.close()
-        if b'role:master' in state:
-            return host, port
-        else:
-            self._sentinel.next_sentinel()
+        return host, port
 
     def _get_masters(self):
         buckets = list()
@@ -553,15 +547,9 @@ class SentinelHashPool(
         for candidate in self._sentinel.get_slaves(bucket):
             candidates.append((candidate[b'ip'], int(candidate[b'port'])))
         shuffle(candidates)
-        for candidate in candidates:
-            host = candidate[0].decode('utf8')
-            port = candidate[1]
-            client = self._get_client(host, port)
-            state = client.execute('INFO', 'replication')
-            client.close()
-            if b'role:slave' in state:
-                return host, port
-        self._sentinel.next_sentinel()
+        host = candidates[0][0].decode('utf8')
+        port = int(candidates[0][1])
+        return host, port
 
     def _get_slaves(self):
         buckets = list()
@@ -691,28 +679,17 @@ class SentinelPool(
         host = candidate[b'ip']
         port = int(candidate[b'port'])
         client = self._get_client(host, port)
-        state = client.execute('INFO', 'replication')
-        if b'role:master' in state:
-            return client
-        else:
-            client.close()
-            self._sentinel.next_sentinel()
+        return client
 
     def _get_slave(self):
         candidates = []
         for candidate in self._sentinel.get_slaves(self.name):
             candidates.append((candidate[b'ip'], int(candidate[b'port'])))
         shuffle(candidates)
-        for candidate in candidates:
-            host = candidate[0]
-            port = candidate[1]
-            client = self._get_client(host, port)
-            state = client.execute('INFO', 'replication')
-            if b'role:slave' in state:
-                return client
-            else:
-                client.close()
-        self._sentinel.next_sentinel()
+        host = candidates[0][0]
+        port = int(candidates[0][1])
+        client = self._get_client(host, port)
+        return client
 
     def execute(self, *args):
         """ Execute arbitrary redis command.

@@ -151,9 +151,9 @@ class TestBasePoolUnit(TestCase):
         self.pool._pool_free.add(Mock())
         self.pool._pool_free.add(Mock())
 
-        self.assertEquals(len(self.pool._pool_free), 5)
+        self.assertEqual(len(self.pool._pool_free), 5)
         self.pool.pool_size = 3
-        self.assertEquals(len(self.pool._pool_free), 3)
+        self.assertEqual(len(self.pool._pool_free), 3)
 
     def test_shrink_pool_can_not_free_all(self):
         self.pool._pool_free.add(Mock())
@@ -168,11 +168,11 @@ class TestBasePoolUnit(TestCase):
         self.pool._pool_used.add(Mock())
         self.pool._pool_used.add(Mock())
 
-        self.assertEquals(len(self.pool._pool_free), 5)
-        self.assertEquals(len(self.pool._pool_used), 5)
+        self.assertEqual(len(self.pool._pool_free), 5)
+        self.assertEqual(len(self.pool._pool_used), 5)
         self.pool.pool_size = 3
-        self.assertEquals(len(self.pool._pool_free), 0)
-        self.assertEquals(len(self.pool._pool_used), 5)
+        self.assertEqual(len(self.pool._pool_free), 0)
+        self.assertEqual(len(self.pool._pool_used), 5)
 
 
 class TestClusterPoolUnit(TestCase):
@@ -431,34 +431,12 @@ class TestSentinelPoolUnit(TestCase):
             }
         )
         client_mock = Mock()
-        client_mock.execute.return_value = b'blarg role:master blarg'
         pool._get_client = Mock()
         pool._get_client.return_value = client_mock
         client = pool._get_master()
         pool._sentinel.get_master.assert_called_with('mymaster')
         pool._get_client.assert_called_with(b'127.0.0.1', 12345)
-        client_mock.execute.assert_called_with('INFO', 'replication')
         self.assertEqual(client, client_mock)
-
-    def test__get_master_role_mismatch(self):
-        pool = pyredis.pool.SentinelPool(sentinels=[('host1', 12345)], name='mymaster')
-        pool._sentinel = Mock()
-        pool._sentinel.get_master.return_value = (
-            {
-                b'ip': b'127.0.0.1',
-                b'port': b'12345'
-            }
-        )
-        client_mock = Mock()
-        client_mock.execute.return_value = b'blarg role:slave blarg'
-        pool._get_client = Mock()
-        pool._get_client.return_value = client_mock
-        client = pool._get_master()
-        pool._sentinel.get_master.assert_called_with('mymaster')
-        pool._get_client.assert_called_with(b'127.0.0.1', 12345)
-        client_mock.execute.assert_called_with('INFO', 'replication')
-        client_mock.close.assert_called_with()
-        self.assertIsNone(client)
 
     def test_get_slave(self):
         self.shuffle_mock.return_value = [
@@ -483,7 +461,6 @@ class TestSentinelPoolUnit(TestCase):
             }
         ]
         client_mock1 = Mock()
-        client_mock1.execute.return_value = b'blarg role:slave blarg'
         pool._get_client = Mock()
         pool._get_client.return_value = client_mock1
         client = pool._get_slave()
@@ -495,109 +472,4 @@ class TestSentinelPoolUnit(TestCase):
             ]
         )
         pool._get_client.assert_called_with(b'127.0.0.1', 12345)
-        client_mock1.execute.assert_called_with('INFO', 'replication')
         self.assertEqual(client, client_mock1)
-
-    def test_get_slave_first_role_mismatch(self):
-        self.shuffle_mock.return_value = [
-            (b'127.0.0.1', 12345),
-            (b'127.0.0.2', 12345),
-            (b'127.0.0.3', 12345)
-        ]
-        pool = pyredis.pool.SentinelPool(sentinels=[('host1', 12345)], name='mymaster', slave_ok=True)
-        pool._sentinel = Mock()
-        pool._sentinel.get_slaves.return_value = [
-            {
-                b'ip': b'127.0.0.1',
-                b'port': b'12345'
-            },
-            {
-                b'ip': b'127.0.0.2',
-                b'port': b'12345'
-            },
-            {
-                b'ip': b'127.0.0.3',
-                b'port': b'12345'
-            }
-        ]
-        client_mock1 = Mock()
-        client_mock1.execute.return_value = b'blarg role:master blarg'
-        client_mock2 = Mock()
-        client_mock2.execute.return_value = b'blarg role:slave blarg'
-        pool._get_client = Mock()
-        pool._get_client.side_effect = [
-            client_mock1,
-            client_mock2
-        ]
-        client = pool._get_slave()
-        self.shuffle_mock.assert_called_with(
-            [
-                (b'127.0.0.1', 12345),
-                (b'127.0.0.2', 12345),
-                (b'127.0.0.3', 12345)
-            ]
-        )
-        pool._get_client.assert_has_calls([
-            call(b'127.0.0.1', 12345),
-            call(b'127.0.0.2', 12345)
-        ])
-        client_mock1.execute.assert_called_with('INFO', 'replication')
-        client_mock1.close.assert_called_with()
-        client_mock2.execute.assert_called_with('INFO', 'replication')
-        self.assertEqual(client, client_mock2)
-
-    def test_get_slave_stale_sentinel(self):
-        self.shuffle_mock.return_value = [
-            (b'127.0.0.1', 12345),
-            (b'127.0.0.2', 12345),
-            (b'127.0.0.3', 12345)
-        ]
-        pool = pyredis.pool.SentinelPool(sentinels=[('host1', 12345)], name='mymaster', slave_ok=True)
-        pool._sentinel = Mock()
-        pool._sentinel.get_slaves.return_value = [
-            {
-                b'ip': b'127.0.0.1',
-                b'port': b'12345'
-            },
-            {
-                b'ip': b'127.0.0.2',
-                b'port': b'12345'
-            },
-            {
-                b'ip': b'127.0.0.3',
-                b'port': b'12345'
-            }
-        ]
-        client_mock1 = Mock()
-        client_mock1.execute.return_value = b'blarg role:master blarg'
-        client_mock2 = Mock()
-        client_mock2.execute.return_value = b'blarg role:master blarg'
-        client_mock3 = Mock()
-        client_mock3.execute.return_value = b'blarg role:master blarg'
-        pool._get_client = Mock()
-        pool._get_client.side_effect = [
-            client_mock1,
-            client_mock2,
-            client_mock3
-        ]
-        client = pool._get_slave()
-        self.shuffle_mock.assert_called_with(
-            [
-                (b'127.0.0.1', 12345),
-                (b'127.0.0.2', 12345),
-                (b'127.0.0.3', 12345)
-            ]
-        )
-        pool._get_client.assert_has_calls([
-            call(b'127.0.0.1', 12345),
-            call(b'127.0.0.2', 12345),
-            call(b'127.0.0.3', 12345)
-        ])
-        client_mock1.execute.assert_called_with('INFO', 'replication')
-        client_mock1.close.assert_called_with()
-        client_mock2.execute.assert_called_with('INFO', 'replication')
-        client_mock2.close.assert_called_with()
-        client_mock3.execute.assert_called_with('INFO', 'replication')
-        client_mock3.close.assert_called_with()
-        self.assertIsNone(client)
-        pool._sentinel.next_sentinel.assert_called_with()

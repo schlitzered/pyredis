@@ -15,7 +15,7 @@ class ReaderTest(TestCase):
         return self.reader.gets()
 
     def test_nothing(self):
-        self.assertEquals(False, self.reply())
+        self.assertEqual(False, self.reply())
 
     def test_error_when_feeding_non_string(self):
         self.assertRaises(TypeError, self.reader.feed, 1)
@@ -44,8 +44,8 @@ class ReaderTest(TestCase):
         self.reader.feed(b'-error\r\n')
         error = self.reply()
 
-        self.assertEquals(hiredis.ReplyError, type(error))
-        self.assertEquals(('error',), error.args)
+        self.assertEqual(hiredis.ReplyError, type(error))
+        self.assertEqual(('error',), error.args)
 
     def test_error_string_partial(self):
         self.reader.feed(b'-err')
@@ -53,8 +53,8 @@ class ReaderTest(TestCase):
         self.reader.feed(b'or\r\n')
         error = self.reply()
 
-        self.assertEquals(hiredis.ReplyError, type(error))
-        self.assertEquals(('error',), error.args)
+        self.assertEqual(hiredis.ReplyError, type(error))
+        self.assertEqual(('error',), error.args)
 
     def test_error_string_partial_footer(self):
         self.reader.feed(b'-error')
@@ -64,16 +64,16 @@ class ReaderTest(TestCase):
         self.reader.feed(b'\n')
         error = self.reply()
 
-        self.assertEquals(hiredis.ReplyError, type(error))
-        self.assertEquals(('error',), error.args)
+        self.assertEqual(hiredis.ReplyError, type(error))
+        self.assertEqual(('error',), error.args)
 
     def test_error_string_with_custom_class(self):
         self.reader = hiredis.Reader(replyError=RuntimeError)
         self.reader.feed(b'-error\r\n')
         error = self.reply()
 
-        self.assertEquals(RuntimeError, type(error))
-        self.assertEquals(('error',), error.args)
+        self.assertEqual(RuntimeError, type(error))
+        self.assertEqual(('error',), error.args)
 
     def test_error_string_with_custom_callable(self):
         class CustomException(Exception):
@@ -83,8 +83,8 @@ class ReaderTest(TestCase):
         self.reader.feed(b'-error\r\n')
         error = self.reply()
 
-        self.assertEquals(CustomException, type(error))
-        self.assertEquals(('error',), error.args)
+        self.assertEqual(CustomException, type(error))
+        self.assertEqual(('error',), error.args)
 
     def test_fail_with_wrong_reply_error_class(self):
         self.assertRaises(TypeError, hiredis.Reader, replyError='wrong')
@@ -93,13 +93,13 @@ class ReaderTest(TestCase):
         self.reader.feed(b'*2\r\n-err0\r\n-err1\r\n')
 
         for r, error in zip(('err0', 'err1'), self.reply()):
-            self.assertEquals(hiredis.ReplyError, type(error))
-            self.assertEquals((r,), error.args)
+            self.assertEqual(hiredis.ReplyError, type(error))
+            self.assertEqual((r,), error.args)
 
     def test_integer(self):
         value = 2 ** 63 - 1  # Largest 64-bit signed integer
         self.reader.feed((':{0}\r\n'.format(value)).encode('ascii'))
-        self.assertEquals(value, self.reply())
+        self.assertEqual(value, self.reply())
 
     def test_integer_partial_int(self):
         value = 2 ** 63 - 1  # Largest 64-bit signed integer
@@ -110,7 +110,7 @@ class ReaderTest(TestCase):
         self.assertFalse(self.reply())
         self.reader.feed(part2)
         self.reader.feed(b'\r\n')
-        self.assertEquals(value, self.reply())
+        self.assertEqual(value, self.reply())
 
     def test_integer_partial_footer(self):
         value = 2 ** 63 - 1  # Largest 64-bit signed integer
@@ -119,11 +119,11 @@ class ReaderTest(TestCase):
         self.reader.feed(b'\r')
         self.assertFalse(self.reply())
         self.reader.feed(b'\n')
-        self.assertEquals(value, self.reply())
+        self.assertEqual(value, self.reply())
 
     def test_status_string(self):
         self.reader.feed(b'+ok\r\n')
-        self.assertEquals(b'ok', self.reply())
+        self.assertEqual(b'ok', self.reply())
 
     def test_status_string_partial(self):
         self.reader.feed(b'+ok')
@@ -137,26 +137,26 @@ class ReaderTest(TestCase):
         self.reader.feed(b'\r')
         self.assertFalse(self.reply())
         self.reader.feed(b'\n')
-        self.assertEquals(b'ok', self.reply())
+        self.assertEqual(b'ok', self.reply())
 
     def test_empty_bulk_string(self):
         self.reader.feed(b'$0\r\n\r\n')
-        self.assertEquals(b'', self.reply())
+        self.assertEqual(b'', self.reply())
 
     def test_NULL_bulk_string(self):
         self.reader.feed(b'$-1\r\n')
-        self.assertEquals(None, self.reply())
+        self.assertEqual(None, self.reply())
 
     def test_bulk_string(self):
         self.reader.feed(b'$5\r\nhello\r\n')
-        self.assertEquals(b'hello', self.reply())
+        self.assertEqual(b'hello', self.reply())
 
     def test_bulk_string_partial(self):
         self.reader.feed(b'$5\r\nhel')
         self.assertFalse(self.reply())
         self.assertFalse(self.reply())
         self.reader.feed(b'lo\r\n')
-        self.assertEquals(b'hello', self.reply())
+        self.assertEqual(b'hello', self.reply())
 
     def test_bulk_string_partial_footer(self):
         self.reader.feed(b'$5\r\nhello')
@@ -164,24 +164,24 @@ class ReaderTest(TestCase):
         self.reader.feed(b'\r')
         self.assertFalse(self.reply())
         self.reader.feed(b'\n')
-        self.assertEquals(b'hello', self.reply())
+        self.assertEqual(b'hello', self.reply())
 
     def test_bulk_string_without_encoding(self):
         snowman = b'\xe2\x98\x83'
         self.reader.feed(b'$3\r\n' + snowman + b'\r\n')
-        self.assertEquals(snowman, self.reply())
+        self.assertEqual(snowman, self.reply())
 
     def test_bulk_string_with_encoding(self):
         snowman = b'\xe2\x98\x83'
         self.reader = hiredis.Reader(encoding='utf-8')
         self.reader.feed(b'$3\r\n' + snowman + b'\r\n')
-        self.assertEquals(snowman.decode('utf-8'), self.reply())
+        self.assertEqual(snowman.decode('utf-8'), self.reply())
 
     def test_bulk_string_with_other_encoding(self):
         snowman = b'\xe2\x98\x83'
         self.reader = hiredis.Reader(encoding='utf-32')
         self.reader.feed(b'$3\r\n' + snowman + b'\r\n')
-        self.assertEquals(snowman, self.reply())
+        self.assertEqual(snowman, self.reply())
 
     def test_bulk_string_with_invalid_encoding(self):
         self.reader = hiredis.Reader(encoding='unknown')
@@ -190,35 +190,35 @@ class ReaderTest(TestCase):
 
     def test_null_multi_bulk(self):
         self.reader.feed(b'*-1\r\n')
-        self.assertEquals(None, self.reply())
+        self.assertEqual(None, self.reply())
 
     def test_empty_multi_bulk(self):
         self.reader.feed(b'*0\r\n')
-        self.assertEquals([], self.reply())
+        self.assertEqual([], self.reply())
 
     def test_multi_bulk(self):
         self.reader.feed(b'*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n')
-        self.assertEquals([b'hello', b'world'], self.reply())
+        self.assertEqual([b'hello', b'world'], self.reply())
 
     def test_multi_bulk_with_partial_reply(self):
         self.reader.feed(b'*2\r\n$5\r\nhello\r\n')
-        self.assertEquals(False, self.reply())
+        self.assertEqual(False, self.reply())
         self.reader.feed(b':1\r\n')
         self.assertEqual([b'hello', 1], self.reply())
 
     def test_nested_multi_bulk(self):
         self.reader.feed(b'*2\r\n*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n$1\r\n!\r\n')
-        self.assertEquals([[b'hello', b'world'], b'!'], self.reply())
+        self.assertEqual([[b'hello', b'world'], b'!'], self.reply())
 
     def test_nested_multi_bulk_partial(self):
         self.reader.feed(b'*2\r\n*2\r\n$5\r\nhello\r')
-        self.assertEquals(False, self.reply())
+        self.assertEqual(False, self.reply())
         self.reader.feed(b'\n$5\r\nworld\r\n$1\r\n!\r\n')
-        self.assertEquals([[b'hello', b'world'], b'!'], self.reply())
+        self.assertEqual([[b'hello', b'world'], b'!'], self.reply())
 
     def test_nested_multi_bulk_depth(self):
         self.reader.feed(b'*1\r\n*1\r\n*1\r\n*1\r\n$1\r\n!\r\n')
-        self.assertEquals([[[[b'!']]]], self.reply())
+        self.assertEqual([[[[b'!']]]], self.reply())
 
     def test_subclassable(self):
         class TestReader(hiredis.Reader):
@@ -227,7 +227,7 @@ class ReaderTest(TestCase):
 
         reader = TestReader()
         reader.feed(b'+ok\r\n')
-        self.assertEquals(b'ok', reader.gets())
+        self.assertEqual(b'ok', reader.gets())
 
     def test_invalid_offset(self):
         data = b'+ok\r\n'
@@ -240,17 +240,17 @@ class ReaderTest(TestCase):
     def test_ok_offset(self):
         data = b'blah+ok\r\n'
         self.reader.feed(data, 4)
-        self.assertEquals(b'ok', self.reply())
+        self.assertEqual(b'ok', self.reply())
 
     def test_ok_length(self):
         data = b'blah+ok\r\n'
         self.reader.feed(data, 4, len(data) - 4)
-        self.assertEquals(b'ok', self.reply())
+        self.assertEqual(b'ok', self.reply())
 
     def test_feed_bytearray(self):
         if sys.hexversion >= 0x02060000:
             self.reader.feed(bytearray(b'+ok\r\n'))
-            self.assertEquals(b'ok', self.reply())
+            self.assertEqual(b'ok', self.reply())
 
 
 class TestWriter(TestCase):

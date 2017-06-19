@@ -186,18 +186,18 @@ class TestHashClientUnit(TestCase):
 
         client = pyredis.client.HashClient(buckets=self.buckets)
 
-        self.assertEquals(client._conn_names, ['localhost_7001', 'localhost_7002', 'localhost_7003'])
+        self.assertEqual(client._conn_names, ['localhost_7001', 'localhost_7002', 'localhost_7003'])
         self.connection_mock.assert_has_calls([
             call(host='localhost', port=7001, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2),
             call(host='localhost', port=7002, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2),
             call(host='localhost', port=7003, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2)
         ])
-        self.assertEquals(client._map[0], 'localhost_7001')
-        self.assertEquals(client._map[1], 'localhost_7002')
-        self.assertEquals(client._map[2], 'localhost_7003')
-        self.assertEquals(client._map[3], 'localhost_7001')
-        self.assertEquals(client._map[4], 'localhost_7002')
-        self.assertEquals(client._map[5], 'localhost_7003')
+        self.assertEqual(client._map[0], 'localhost_7001')
+        self.assertEqual(client._map[1], 'localhost_7002')
+        self.assertEqual(client._map[2], 'localhost_7003')
+        self.assertEqual(client._map[3], 'localhost_7001')
+        self.assertEqual(client._map[4], 'localhost_7002')
+        self.assertEqual(client._map[5], 'localhost_7003')
 
     def test__bulk_fetch(self):
         conn_mock_1 = Mock()
