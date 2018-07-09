@@ -315,11 +315,9 @@ class TestConnectionUnit(TestCase):
         cmd = 'ECHO'
         payload = "x" * 512
         msg = writer(cmd, payload)
-        length = 534
 
         sock_mock = Mock()
 
-        sock_mock.send.side_effect = [length]
         self.socket_mock.socket.return_value = sock_mock
 
         reader_mock = Mock()
@@ -330,7 +328,7 @@ class TestConnectionUnit(TestCase):
         connection._setdb = Mock()
         connection.write(cmd, payload)
 
-        self.assertEqual(sock_mock.send.call_args_list, [call(msg)])
+        self.assertEqual(sock_mock.sendall.call_args_list, [call(msg)])
 
     def test_write_two_chunks(self):
         cmd = 'ECHO'
@@ -339,7 +337,6 @@ class TestConnectionUnit(TestCase):
 
         sock_mock = Mock()
 
-        sock_mock.send.side_effect = [500, 34]
         self.socket_mock.socket.return_value = sock_mock
 
         reader_mock = Mock()
@@ -350,7 +347,7 @@ class TestConnectionUnit(TestCase):
         connection._setdb = Mock()
         connection.write(cmd, payload)
 
-        self.assertEqual(sock_mock.send.call_args_list, [call(msg), call(msg[500:])])
+        self.assertEqual(sock_mock.sendall.call_args_list, [call(msg)])
 
     def test_write_exception_brokenpipeerror(self):
         cmd = 'ECHO'
@@ -358,7 +355,7 @@ class TestConnectionUnit(TestCase):
 
         sock_mock = Mock()
 
-        sock_mock.send.side_effect = [BrokenPipeError]
+        sock_mock.sendall.side_effect = [BrokenPipeError]
         self.socket_mock.socket.return_value = sock_mock
 
         reader_mock = Mock()

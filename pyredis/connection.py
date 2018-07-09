@@ -235,12 +235,8 @@ class Connection(object):
         if not self._sock:
             self._connect()
         msg = self._writer(*args)
-        msg_len = len(msg)
-        bytes_sent = 0
-        while bytes_sent < msg_len:
-            try:
-                sent = self._sock.send(msg[bytes_sent:])
-            except BrokenPipeError as err:
-                self.close()
-                raise PyRedisConnError('Connection lost while writing: {0}'.format(err))
-            bytes_sent += sent
+        try:
+            self._sock.sendall(msg)
+        except BrokenPipeError as err:
+            self.close()
+            raise PyRedisConnError('Connection lost while writing: {0}'.format(err))

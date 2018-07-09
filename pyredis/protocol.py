@@ -228,19 +228,21 @@ def to_bytes(value):
 
 def writer(*args):
     buf = list()
+    extend = buf.extend
 
-    buf.append(TYPE_ARRAY)
-    buf.append(to_bytes(len(args)))
-    buf.append(SYM_CRLF)
+    extend((
+        TYPE_ARRAY,
+        str(len(args)).encode(),
+        SYM_CRLF
+    ))
 
-    for member in args:
-        member = to_bytes(member)
-
-        buf.append(TYPE_BULK)
-        buf.append(to_bytes(len(member)))
-        buf.append(SYM_CRLF)
-
-        buf.append(member)
-        buf.append(SYM_CRLF)
+    for member in map(to_bytes, args):
+        extend((
+            TYPE_BULK,
+            str(len(member)).encode(),
+            SYM_CRLF,
+            member,
+            SYM_CRLF
+        ))
 
     return b''.join(buf)
