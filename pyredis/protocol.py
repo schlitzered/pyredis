@@ -216,12 +216,12 @@ class Reader(object):
 
 
 def to_bytes(value):
-    if isinstance(value, str):
+    if isinstance(value, bytes):
+        return value
+    elif isinstance(value, str):
         return value.encode()
     elif isinstance(value, (int, float)):
         return str(value).encode()
-    elif isinstance(value, bytes):
-        return value
     else:
         raise ValueError('Unsupported value, has to be a instance of bytes, str, int or float')
 

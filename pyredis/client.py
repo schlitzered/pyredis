@@ -21,7 +21,7 @@ class Client(
 ):
     """ Base Client for Talking to Redis.
 
-    Inherits the following Commmand classes:
+    Inherits the following Command classes:
       - commands.Connection,
       - commands.Hash,
       - commands.HyperLogLog,
@@ -346,7 +346,7 @@ class HashClient(
     distribute the key spaces evenly between available pairs.
     
     --- Warning ---
-    Since this is static hashing, the the order of pairs has to match on each client you use!
+    Since this is static hashing, the order of pairs has to match on each client you use!
     Also changing the number of pairs will change the mapping between buckets and pairs,
     rendering your data inaccessible!
 

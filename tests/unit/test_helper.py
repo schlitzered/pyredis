@@ -123,7 +123,7 @@ class TestClusterMap(TestCase):
         result = clustermap._fetch_map()
 
         self.assertEqual(result, self.map)
-        conn1.write.assert_called_with('CLUSTER', 'SLOTS')
+        conn1.write.assert_called_with(b'CLUSTER', b'SLOTS')
         self.assertTrue(conn1.close.called)
 
     def test__fetch_map_second_try_ok(self):
@@ -139,9 +139,9 @@ class TestClusterMap(TestCase):
         result = clustermap._fetch_map()
 
         self.assertEqual(result, self.map)
-        conn1.write.assert_called_with('CLUSTER', 'SLOTS')
+        conn1.write.assert_called_with(b'CLUSTER', b'SLOTS')
         self.assertTrue(conn1.close.called)
-        conn2.write.assert_called_with('CLUSTER', 'SLOTS')
+        conn2.write.assert_called_with(b'CLUSTER', b'SLOTS')
         self.assertTrue(conn2.close.called)
 
     def test__fetch_map_exception(self):
@@ -165,11 +165,11 @@ class TestClusterMap(TestCase):
             call(host='host3', port=12345, encoding='utf-8')
         ])
 
-        conn1.write.assert_called_with('CLUSTER', 'SLOTS')
+        conn1.write.assert_called_with(b'CLUSTER', b'SLOTS')
         self.assertTrue(conn1.close.called)
-        conn2.write.assert_called_with('CLUSTER', 'SLOTS')
+        conn2.write.assert_called_with(b'CLUSTER', b'SLOTS')
         self.assertTrue(conn2.close.called)
-        conn3.write.assert_called_with('CLUSTER', 'SLOTS')
+        conn3.write.assert_called_with(b'CLUSTER', b'SLOTS')
         self.assertTrue(conn3.close.called)
 
     def test_update(self):

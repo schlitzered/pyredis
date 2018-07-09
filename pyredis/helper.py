@@ -56,7 +56,7 @@ class ClusterMap(object):
         for seed in self._seeds:
             conn = Connection(host=seed[0], port=seed[1], encoding='utf-8')
             try:
-                conn.write('CLUSTER', 'SLOTS')
+                conn.write(b'CLUSTER', b'SLOTS')
                 return conn.read()
             except PyRedisError:
                 pass
@@ -86,13 +86,12 @@ class ClusterMap(object):
             result.add(host[selector])
         return result
 
-    def update(self, id):
+    def update(self, map_id):
         with self._lock:
-            if id != self.id:
+            if map_id != self.id:
                 return self.id
             for entry in self._fetch_map():
                 for slot in range(entry[0], entry[1]+1):
                     self._update_slot(slot, entry[2], entry[3:])
             self._id = uuid4()
             return self.id
-
