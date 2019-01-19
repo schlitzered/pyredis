@@ -66,7 +66,7 @@ Using a Connection Pool
     from pyredis import Pool
 
     pool = Pool(host="localhost")
-    client = pool.aquire()
+    client = pool.acquire()
     client.ping()
     b'PONG'
     pool.release(client)
@@ -79,7 +79,7 @@ Using a Cluster Connection Pool
     from pyredis import ClusterPool
 
     pool = ClusterPool(seeds=[('seed1', 6379), ('seed2', 6379), ('seed3', 6379)])
-    client = pool.aquire()
+    client = pool.acquire()
     client.ping(shard_key='test')
     b'PONG'
     pool.release(client)
@@ -92,7 +92,7 @@ Using a Hash Connection Pool
     from pyredis import HashPool
 
     pool = HashPool(buckets=[('host1', 6379), ('host2', 6379), ('host3', 6379)])
-    client = pool.aquire()
+    client = pool.acquire()
     client.ping(shard_key='test')
     b'PONG'
     pool.release(client)
@@ -105,7 +105,7 @@ Using a Sentinel backed Connection Hash Pool
     from pyredis import SentinelHashPool
 
     pool = SentinelPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)], buckets=['bucket1', 'bucket2', 'bucket3*])
-    client = pool.aquire()
+    client = pool.acquire()
     client.ping()
     b'PONG'
     pool.release(client)
@@ -118,7 +118,7 @@ Using a Sentinel backed Connection Pool
     from pyredis import SentinelPool
 
     pool = SentinelPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)], name=pool_name)
-    client = pool.aquire()
+    client = pool.acquire()
     client.ping()
     b'PONG'
     pool.release(client)
