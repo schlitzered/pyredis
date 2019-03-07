@@ -4,29 +4,35 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "bento/centos-7"
 
-  config.vm.synced_folder ".", "/home/vagrant/redis-scripts"
+  config.vm.provision :shell, :path => "redis-scripts/install.sh"
+  config.vm.synced_folder "./redis-scripts", "/home/vagrant/redis-scripts"
 
-#  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
-  config.vm.provision :shell, :path => "build_redis.sh"
-  config.vm.provision :shell, :path => "install_redis.sh"
-  config.vm.provision :file, :source => ".bash_profile", :destination => "/home/vagrant/.bash_profile"
+  config.vm.network "forwarded_port", guest: 4000, host: 4000
+  config.vm.network "forwarded_port", guest: 4001, host: 4001
+  config.vm.network "forwarded_port", guest: 4002, host: 4002
+
+  config.vm.network "forwarded_port", guest: 5000, host: 5000
+  config.vm.network "forwarded_port", guest: 5001, host: 5001
+  config.vm.network "forwarded_port", guest: 5002, host: 5002
+
+  config.vm.network "forwarded_port", guest: 6000, host: 6000
+  config.vm.network "forwarded_port", guest: 6001, host: 6001
+
+  config.vm.network "forwarded_port", guest: 6010, host: 6020
+  config.vm.network "forwarded_port", guest: 6011, host: 6021
+
+  config.vm.network "forwarded_port", guest: 6020, host: 6020
+  config.vm.network "forwarded_port", guest: 6021, host: 6021
 
   config.vm.network "forwarded_port", guest: 7000, host: 7000
   config.vm.network "forwarded_port", guest: 7001, host: 7001
-  config.vm.network "forwarded_port", guest: 7002, host: 7002
-  config.vm.network "forwarded_port", guest: 7003, host: 7003
-  config.vm.network "forwarded_port", guest: 7004, host: 7004
-  config.vm.network "forwarded_port", guest: 7005, host: 7005
-  config.vm.network "forwarded_port", guest: 8000, host: 8000
-  config.vm.network "forwarded_port", guest: 8001, host: 8001
-  config.vm.network "forwarded_port", guest: 8002, host: 8002
-  config.vm.network "forwarded_port", guest: 8003, host: 8003
-  config.vm.network "forwarded_port", guest: 8004, host: 8004
-  config.vm.network "forwarded_port", guest: 8005, host: 8005
-  config.vm.network "forwarded_port", guest: 9000, host: 9000
-  config.vm.network "forwarded_port", guest: 9001, host: 9001
-  config.vm.network "forwarded_port", guest: 9002, host: 9002
+
+  config.vm.network "forwarded_port", guest: 7010, host: 7020
+  config.vm.network "forwarded_port", guest: 7011, host: 7021
+
+  config.vm.network "forwarded_port", guest: 7020, host: 7020
+  config.vm.network "forwarded_port", guest: 7021, host: 7021
 end
