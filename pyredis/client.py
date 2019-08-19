@@ -247,6 +247,7 @@ class ClusterClient(
             host=host, port=int(port),
             conn_timeout=self._conn_timeout,
             read_timeout=self._read_timeout,
+            read_only=self._slave_ok,
             encoding=self._encoding,
             password=self._password,
             database=self._database

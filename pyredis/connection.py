@@ -66,6 +66,7 @@ class Connection(object):
             password=None,
             encoding=None,
             conn_timeout=2,
+            read_only=False,
             read_timeout=2,
             sentinel=False):
 
@@ -73,6 +74,7 @@ class Connection(object):
             raise PyRedisError('Ether host or unix_sock has to be provided')
         self._closed = False
         self._conn_timeout = conn_timeout
+        self._read_only = read_only
         self._read_timeout = read_timeout
         self._encoding = encoding
         self._reader = None
@@ -111,6 +113,7 @@ class Connection(object):
         if not self._sentinel:
             self._authenticate()
             self._setdb()
+            self._set_read_only()
         self._sock.settimeout(self._read_timeout)
 
     def _connect_inet46(self):
@@ -169,6 +172,15 @@ class Connection(object):
         except ReplyError as err:
             self.close()
             raise err
+
+    def _set_read_only(self):
+        if self._read_only:
+            self.write('READONLY')
+            try:
+                self.read()
+            except ReplyError as err:
+                self.close()
+                raise err
 
     def close(self):
         """ Close Client Connection.

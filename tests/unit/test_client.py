@@ -289,7 +289,6 @@ class TestHashClientUnit(TestCase):
         self.connection_mock.side_effect = [conn_mock_1, conn_mock_2, conn_mock_3]
 
         client = pyredis.client.HashClient(buckets=self.buckets)
-        print(client._conns)
         client._execute_basic = Mock()
         client._execute_basic.return_value = b'PONG'
 
@@ -721,6 +720,7 @@ class TestClusterClientUnit(TestCase):
         self.connection_mock.assert_called_with(
             host='conn1', port=12345,
             conn_timeout=self.client._conn_timeout,
+            read_only=self.client._slave_ok,
             read_timeout=self.client._read_timeout,
             encoding=self.client._encoding,
             password=self.client._password,

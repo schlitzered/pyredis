@@ -302,6 +302,16 @@ class TestConnectionUnit(TestCase):
         connection.write.assert_called_with('SELECT', 23234)
         connection.read.assert_called_with()
 
+    def test__set_read_only_true(self):
+        connection = pyredis.connection.Connection(host='localhost', read_only=True)
+        connection.read = Mock()
+        connection.read.return_value = b'OK'
+        connection.write = Mock()
+        connection._sock = Mock()
+        connection._set_read_only()
+        connection.write.assert_called_with('READONLY')
+        connection.read.assert_called_with()
+
     def test_closed_false(self):
         connection = pyredis.connection.Connection(unix_sock='/tmp/test.sock')
         self.assertFalse(connection.closed)
