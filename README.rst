@@ -46,4 +46,3 @@ Contributing
 If you'd like to contribute, fork the project, make a patch and send a pull
 request.
 
-
