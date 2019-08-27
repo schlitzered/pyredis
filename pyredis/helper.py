@@ -38,11 +38,12 @@ def slot_from_key(key):
 
 
 class ClusterMap(object):
-    def __init__(self, seeds, lock=Lock()):
+    def __init__(self, seeds, password=None, lock=Lock()):
         self._id = uuid4()
         self._lock = lock
         self._map = {}
         self._seeds = deque(seeds)
+        self._password = password
 
     @property
     def id(self):
@@ -54,7 +55,7 @@ class ClusterMap(object):
 
     def _fetch_map(self):
         for seed in self._seeds:
-            conn = Connection(host=seed[0], port=seed[1], encoding='utf-8')
+            conn = Connection(host=seed[0], port=seed[1], encoding='utf-8', password=self._password)
             try:
                 conn.write(b'CLUSTER', b'SLOTS')
                 return conn.read()

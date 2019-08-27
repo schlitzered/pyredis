@@ -213,9 +213,9 @@ class ClusterPool(
     :type retries: int
     """
 
-    def __init__(self, seeds, slave_ok=False, **kwargs):
-        super().__init__(**kwargs)
-        self._map = ClusterMap(seeds=seeds)
+    def __init__(self, seeds, slave_ok=False, password=None, **kwargs):
+        super().__init__(password=password, **kwargs)
+        self._map = ClusterMap(seeds=seeds, password=password)
         self._slave_ok = slave_ok
         self._cluster = True
 
