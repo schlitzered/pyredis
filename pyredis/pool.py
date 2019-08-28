@@ -452,9 +452,9 @@ class SentinelHashPool(
         In case a sentinel delivers stale data, how many other sentinels should be tried.
     :type retries: int
     """
-    def __init__(self, sentinels, buckets, slave_ok=False, retries=3, **kwargs):
+    def __init__(self, sentinels, buckets, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
         super().__init__(**kwargs)
-        self._sentinel = SentinelClient(sentinels=sentinels)
+        self._sentinel = SentinelClient(sentinels=sentinels, password=sentinel_password)
         self._buckets = buckets
         self._slave_ok = slave_ok
         self._retries = retries
@@ -613,9 +613,9 @@ class SentinelPool(
         In case a sentinel delivers stale data, how many other sentinels should be tried.
     :type retries: int
     """
-    def __init__(self, sentinels, name, slave_ok=False, retries=3, **kwargs):
+    def __init__(self, sentinels, name, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
         super().__init__(**kwargs)
-        self._sentinel = SentinelClient(sentinels=sentinels)
+        self._sentinel = SentinelClient(sentinels=sentinels, password=sentinel_password)
         self._name = name
         self._slave_ok = slave_ok
         self._retries = retries

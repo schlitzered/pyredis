@@ -470,12 +470,12 @@ class TestSentinelClientUnit(TestCase):
         conn_mock = Mock()
         self.connection_mock.return_value = conn_mock
         sentinels = [('host1', 12345), ('host2', 12345), ('host3', 12345)]
-        client = pyredis.client.SentinelClient(sentinels=sentinels)
+        client = pyredis.client.SentinelClient(sentinels=sentinels, password='blubber')
         client.execute = Mock()
 
         self.assertTrue(client._sentinel_connect(sentinel=('host1', 12345)))
         self.connection_mock.assert_called_with(
-            host='host1', port=12345, conn_timeout=0.1, sentinel=True)
+            host='host1', port=12345, conn_timeout=0.1, sentinel=True, password='blubber')
         client.execute.assert_called_with('PING')
         self.assertEqual(client._conn, conn_mock)
 
@@ -490,7 +490,7 @@ class TestSentinelClientUnit(TestCase):
 
         self.assertFalse(client._sentinel_connect(sentinel=('host1', 12345)))
         self.connection_mock.assert_called_with(
-            host='host1', port=12345, conn_timeout=0.1, sentinel=True)
+            host='host1', port=12345, conn_timeout=0.1, sentinel=True, password=None)
         client.execute.assert_called_with('PING')
         client.close.assert_called_with()
 

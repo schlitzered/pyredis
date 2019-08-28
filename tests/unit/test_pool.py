@@ -315,7 +315,7 @@ class TestSentinelPoolUnit(TestCase):
     def test___init__default_args(self):
         pool = pyredis.pool.SentinelPool(sentinels=[('host1', 12345)], name='mymaster')
         pool._sentinel.sentinels = [('host1', 12345)]
-        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)])
+        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)], password=None)
         self.assertEqual(pool.name, 'mymaster')
         self.assertEqual(pool.retries, 3)
         self.assertFalse(pool.slave_ok)
@@ -327,10 +327,11 @@ class TestSentinelPoolUnit(TestCase):
             sentinels=[('host1', 12345)],
             name='mymaster',
             slave_ok=True,
-            retries=5
+            retries=5,
+            sentinel_password='blubber'
         )
         pool._sentinel.sentinels = [('host1', 12345)]
-        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)])
+        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)], password='blubber')
         self.assertEqual(pool.name, 'mymaster')
         self.assertEqual(pool.retries, 5)
         self.assertTrue(pool.slave_ok)
