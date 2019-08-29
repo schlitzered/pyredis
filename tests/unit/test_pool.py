@@ -191,16 +191,18 @@ class TestClusterPoolUnit(TestCase):
 
         self.addCleanup(patch.stopall)
 
-        self.pool = pyredis.pool.ClusterPool(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)])
+        self.pool = pyredis.pool.ClusterPool(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
+                                             password='blubber')
 
     def test___init__(self):
-        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)])
+        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
+                                         password='blubber')
         self.assertEqual(self.pool._map, self.map_mock_inst)
         self.assertFalse(self.pool.slave_ok)
 
     def test___init__slave_ok_true(self):
         self.pool = pyredis.pool.ClusterPool(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)], slave_ok=True)
-        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)])
+        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)], password=None)
         self.assertEqual(self.pool._map, self.map_mock_inst)
         self.assertTrue(self.pool.slave_ok)
 
@@ -208,7 +210,7 @@ class TestClusterPoolUnit(TestCase):
         client = self.pool._connect()
         self.client_mock.assert_called_with(
             conn_timeout=2,
-            password=None,
+            password='blubber',
             read_timeout=2,
             cluster_map=self.pool._map,
             encoding=None,
@@ -313,7 +315,7 @@ class TestSentinelPoolUnit(TestCase):
     def test___init__default_args(self):
         pool = pyredis.pool.SentinelPool(sentinels=[('host1', 12345)], name='mymaster')
         pool._sentinel.sentinels = [('host1', 12345)]
-        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)])
+        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)], password=None)
         self.assertEqual(pool.name, 'mymaster')
         self.assertEqual(pool.retries, 3)
         self.assertFalse(pool.slave_ok)
@@ -325,10 +327,11 @@ class TestSentinelPoolUnit(TestCase):
             sentinels=[('host1', 12345)],
             name='mymaster',
             slave_ok=True,
-            retries=5
+            retries=5,
+            sentinel_password='blubber'
         )
         pool._sentinel.sentinels = [('host1', 12345)]
-        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)])
+        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)], password='blubber')
         self.assertEqual(pool.name, 'mymaster')
         self.assertEqual(pool.retries, 5)
         self.assertTrue(pool.slave_ok)

@@ -213,9 +213,9 @@ class ClusterPool(
     :type retries: int
     """
 
-    def __init__(self, seeds, slave_ok=False, **kwargs):
-        super().__init__(**kwargs)
-        self._map = ClusterMap(seeds=seeds)
+    def __init__(self, seeds, slave_ok=False, password=None, **kwargs):
+        super().__init__(password=password, **kwargs)
+        self._map = ClusterMap(seeds=seeds, password=password)
         self._slave_ok = slave_ok
         self._cluster = True
 
@@ -451,10 +451,15 @@ class SentinelHashPool(
     :param retries:
         In case a sentinel delivers stale data, how many other sentinels should be tried.
     :type retries: int
+
+    :param sentinel_password:
+        Password used for authentication of Sentinel instance itself. If None, no authentication is done.
+        Only available starting with Redis 5.0.1.
+    :type sentinel_password: str
     """
-    def __init__(self, sentinels, buckets, slave_ok=False, retries=3, **kwargs):
+    def __init__(self, sentinels, buckets, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
         super().__init__(**kwargs)
-        self._sentinel = SentinelClient(sentinels=sentinels)
+        self._sentinel = SentinelClient(sentinels=sentinels, password=sentinel_password)
         self._buckets = buckets
         self._slave_ok = slave_ok
         self._retries = retries
@@ -612,10 +617,15 @@ class SentinelPool(
     :param retries:
         In case a sentinel delivers stale data, how many other sentinels should be tried.
     :type retries: int
+
+    :param sentinel_password:
+        Password used for authentication of Sentinel instance itself. If None, no authentication is done.
+        Only available starting with Redis 5.0.1.
+    :type sentinel_password: str
     """
-    def __init__(self, sentinels, name, slave_ok=False, retries=3, **kwargs):
+    def __init__(self, sentinels, name, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
         super().__init__(**kwargs)
-        self._sentinel = SentinelClient(sentinels=sentinels)
+        self._sentinel = SentinelClient(sentinels=sentinels, password=sentinel_password)
         self._name = name
         self._slave_ok = slave_ok
         self._retries = retries

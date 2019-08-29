@@ -517,11 +517,18 @@ class TestConnectionUnit(TestCase):
         connection._reader = reader_mock
         self.assertRaises(ReplyError, connection.read)
 
-    def test_read_exception_result_no_raise(self):
-        connection = pyredis.connection.Connection(host='127.0.0.1', encoding='utf-8')
-        connection._sock = True
+    def test_authenticate_sentinel(self):
+        connection = pyredis.connection.Connection(host='127.0.0.1', encoding='utf-8', sentinel=True)
+        authenticate_mock = Mock()
+        setdb_mock = Mock()
+        set_read_only_mock = Mock()
 
-        reader_mock = Mock()
-        reader_mock.gets.return_value = ReplyError('blub')
-        connection._reader = reader_mock
-        connection.read(raise_on_result_err=False)
+        connection._authenticate = authenticate_mock
+        connection._setdb = setdb_mock
+        connection._set_read_only = set_read_only_mock
+
+        connection._connect()
+
+        authenticate_mock.assert_called()
+        setdb_mock.assert_not_called()
+        set_read_only_mock.assert_not_called()
