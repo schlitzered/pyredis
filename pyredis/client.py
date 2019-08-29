@@ -571,6 +571,11 @@ class SentinelClient(object):
     :param sentinels:
         Accepts a list of sentinels in this form: [('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)]
     :type sentinels: list
+
+    :param password:
+        Password used for authentication of Sentinel instance itself. If None, no authentication is done.
+        Only available starting with Redis 5.0.1.
+    :type password: str
     """
     def __init__(self, sentinels, password=None):
         self._conn = None

@@ -451,6 +451,11 @@ class SentinelHashPool(
     :param retries:
         In case a sentinel delivers stale data, how many other sentinels should be tried.
     :type retries: int
+
+    :param sentinel_password:
+        Password used for authentication of Sentinel instance itself. If None, no authentication is done.
+        Only available starting with Redis 5.0.1.
+    :type sentinel_password: str
     """
     def __init__(self, sentinels, buckets, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
         super().__init__(**kwargs)
@@ -612,6 +617,11 @@ class SentinelPool(
     :param retries:
         In case a sentinel delivers stale data, how many other sentinels should be tried.
     :type retries: int
+
+    :param sentinel_password:
+        Password used for authentication of Sentinel instance itself. If None, no authentication is done.
+        Only available starting with Redis 5.0.1.
+    :type sentinel_password: str
     """
     def __init__(self, sentinels, name, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
         super().__init__(**kwargs)
