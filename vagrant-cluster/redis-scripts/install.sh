@@ -2,10 +2,11 @@
 
 yum install git gcc memkind-devel tcl vim -y
 
+wget https://github.com/antirez/redis/archive/5.0.5.tar.gz
+tar xf 5.0.5.tar.gz
+mv redis-5.0.5 redis
 
-git clone https://github.com/antirez/redis.git
 cd redis
-git checkout --track origin/unstable
 
 make
 
@@ -52,6 +53,8 @@ function redis_instance {
     echo 'maxmemory 64mb' >> redis_${name}.conf
     echo "logfile /var/log/redis/${name}.log" >> redis_${name}.conf
     echo "dir /var/lib/redis/${name}" >> redis_${name}.conf
+    echo "requirepass P4ssW0rd" >> redis_${name}.conf
+    echo "masterauth P4ssW0rd" >> redis_${name}.conf
     if [[ "${cluster}" = "yes" ]]
     then
         echo "cluster-enabled yes"  >> redis_${name}.conf
@@ -100,8 +103,11 @@ redis-cli -p 5001 slaveof localhost 5000
 redis-cli -p 5002 slaveof localhost 5000
 
 redis-cli -p 4000 sentinel monitor standalone 127.0.0.1 5000 2
+redis-cli -p 4000 sentinel auth-pass standalone P4ssW0rd
 redis-cli -p 4001 sentinel monitor standalone 127.0.0.1 5000 2
+redis-cli -p 4001 sentinel auth-pass standalone P4ssW0rd
 redis-cli -p 4002 sentinel monitor standalone 127.0.0.1 5000 2
+redis-cli -p 4002 sentinel auth-pass standalone P4ssW0rd
 
 for i in 0 1 2
 do
@@ -122,16 +128,25 @@ redis-cli -p 6011 slaveof localhost 6020
 redis-cli -p 6021 slaveof localhost 6020
 
 redis-cli -p 4000 sentinel monitor bucket0 127.0.0.1 6000 2
+redis-cli -p 4000 sentinel auth-pass bucket0 P4ssW0rd
 redis-cli -p 4000 sentinel monitor bucket1 127.0.0.1 6010 2
+redis-cli -p 4000 sentinel auth-pass bucket1 P4ssW0rd
 redis-cli -p 4000 sentinel monitor bucket2 127.0.0.1 6020 2
+redis-cli -p 4000 sentinel auth-pass bucket2 P4ssW0rd
 
 redis-cli -p 4001 sentinel monitor bucket0 127.0.0.1 6000 2
+redis-cli -p 4001 sentinel auth-pass bucket0 P4ssW0rd
 redis-cli -p 4001 sentinel monitor bucket1 127.0.0.1 6010 2
+redis-cli -p 4001 sentinel auth-pass bucket1 P4ssW0rd
 redis-cli -p 4001 sentinel monitor bucket2 127.0.0.1 6020 2
+redis-cli -p 4001 sentinel auth-pass bucket2 P4ssW0rd
 
 redis-cli -p 4002 sentinel monitor bucket0 127.0.0.1 6000 2
+redis-cli -p 4002 sentinel auth-pass bucket0 P4ssW0rd
 redis-cli -p 4002 sentinel monitor bucket1 127.0.0.1 6010 2
+redis-cli -p 4002 sentinel auth-pass bucket1 P4ssW0rd
 redis-cli -p 4002 sentinel monitor bucket2 127.0.0.1 6020 2
+redis-cli -p 4002 sentinel auth-pass bucket2 P4ssW0rd
 
 for i in 0 1 2
 do
@@ -145,4 +160,4 @@ done
 
 sleep 2
 
-printf 'yes\n' | redis-cli --cluster-replicas 1 --cluster create  127.0.0.1:7000 127.0.0.1:7010 127.0.0.1:7020 127.0.0.1:7001 127.0.0.1:7011 127.0.0.1:7021
+printf 'yes\n' | redis-cli -a P4ssW0rd --cluster-replicas 1 --cluster create  127.0.0.1:7000 127.0.0.1:7010 127.0.0.1:7020 127.0.0.1:7001 127.0.0.1:7011 127.0.0.1:7021

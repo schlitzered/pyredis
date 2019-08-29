@@ -104,9 +104,9 @@ Using a Sentinel backed Connection Hash Pool
 
     from pyredis import SentinelHashPool
 
-    pool = SentinelPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)], buckets=['bucket1', 'bucket2', 'bucket3*])
+    pool = SentinelHashPool(sentinels=[('sentinel1', 26379), ('sentinel2', 26379), ('sentinel3', 26379)], buckets=['bucket1', 'bucket2', 'bucket3'])
     client = pool.acquire()
-    client.ping()
+    client.ping(shard_key='test')
     b'PONG'
     pool.release(client)
 
