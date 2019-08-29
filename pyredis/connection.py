@@ -88,8 +88,6 @@ class Connection(object):
         self.database = database
 
     def _authenticate(self):
-        if self._sentinel:
-            return
         if self.password:
             self.write('AUTH', self.password)
             try:
@@ -110,8 +108,8 @@ class Connection(object):
             self._reader = Reader(encoding=self._encoding)
         else:
             self._reader = Reader()
+        self._authenticate()
         if not self._sentinel:
-            self._authenticate()
             self._setdb()
             self._set_read_only()
         self._sock.settimeout(self._read_timeout)
