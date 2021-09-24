@@ -12,6 +12,7 @@ TYPE_BULK = b'$'
 TYPE_ARRAY = b'*'
 
 __all__ = [
+    'to_bytes',
     'Reader',
     'writer'
 ]
