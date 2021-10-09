@@ -202,6 +202,10 @@ class ClusterClient(
     :param read_timeout:
         Read Timeout.
     :type read_timeout: float
+
+    :param username:
+        Username used for acl scl authentication. If not set, fall back use legacy auth.
+    :type username: str
     """
     def __init__(
             self,
@@ -212,7 +216,9 @@ class ClusterClient(
             slave_ok=False,
             conn_timeout=2,
             read_timeout=2,
-            cluster_map=None):
+            cluster_map=None,
+            username=None
+    ):
         super().__init__()
         if not bool(seeds) != bool(cluster_map):
             raise PyRedisError('Ether seeds or cluster_map has to be provided')
@@ -229,6 +235,7 @@ class ClusterClient(
         else:
             self._map = ClusterMap(seeds=seeds)
         self._map_id = self._map.id
+        self._username = username
 
     def _cleanup_conns(self):
         hosts = self._map.hosts(slave=self._slave_ok)
@@ -250,7 +257,8 @@ class ClusterClient(
             read_only=self._slave_ok,
             encoding=self._encoding,
             password=self._password,
-            database=self._database
+            database=self._database,
+            username=self._username
         )
         self._conns[sock] = client
 
@@ -364,7 +372,16 @@ class HashClient(
       - commands.String,
       - commands.Transaction
     """
-    def __init__(self, buckets, database=0, password=None, encoding=None, conn_timeout=2, read_timeout=2):
+    def __init__(
+            self,
+            buckets,
+            database=None,
+            password=None,
+            encoding=None,
+            conn_timeout=2,
+            read_timeout=2,
+            username=None
+    ):
 
         super().__init__()
         self._conns = dict()
@@ -378,7 +395,15 @@ class HashClient(
         self._closed = False
         self._cluster = True
         self._map = dict()
-        self._init_conns(buckets, database, password, encoding, conn_timeout, read_timeout)
+        self._init_conns(
+            buckets=buckets,
+            database=database,
+            password=password,
+            encoding=encoding,
+            conn_timeout=conn_timeout,
+            read_timeout=read_timeout,
+            username=username
+        )
         self._init_map()
 
     def _bulk_fetch(self):
@@ -401,14 +426,20 @@ class HashClient(
         if self._bulk_size_current == self._bulk_size:
             self._bulk_fetch()
 
-    def _init_conns(self, buckets, database, password, encoding, conn_timeout, read_timeout):
+    def _init_conns(self, buckets, database, password, encoding, conn_timeout, read_timeout, username):
         for bucket in buckets:
             host, port = bucket
             bucketname = '{0}_{1}'.format(host, port)
             self._conn_names.append(bucketname)
             self._conns[bucketname] = Connection(
-                host=host, port=port, database=database, password=password,
-                encoding=encoding, conn_timeout=conn_timeout, read_timeout=read_timeout
+                host=host,
+                port=port,
+                database=database,
+                password=password,
+                encoding=encoding,
+                conn_timeout=conn_timeout,
+                read_timeout=read_timeout,
+                username=username
             )
 
     def _init_map(self):
@@ -576,15 +607,27 @@ class SentinelClient(object):
         Password used for authentication of Sentinel instance itself. If None, no authentication is done.
         Only available starting with Redis 5.0.1.
     :type password: str
+
+    :param username:
+        Username used for acl scl authentication. If not set, fall back use legacy auth.
+    :type username: str
     """
-    def __init__(self, sentinels, password=None):
+    def __init__(self, sentinels, password=None, username=None):
         self._conn = None
         self._sentinels = deque(sentinels)
         self._password = password
+        self._username = username
 
     def _sentinel_connect(self, sentinel):
         host, port = sentinel
-        self._conn = Connection(host=host, port=port, conn_timeout=0.1, sentinel=True, password=self._password)
+        self._conn = Connection(
+            host=host,
+            port=port,
+            conn_timeout=0.1,
+            sentinel=True,
+            password=self._password,
+            username=self._username
+        )
         try:
             self.execute('PING')
             return True

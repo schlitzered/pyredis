@@ -119,14 +119,22 @@ class TestClusterMap(TestCase):
 
         self.connection_mock.return_value = conn1
 
-        clustermap = ClusterMap(self.seeds, password="blubber")
+        clustermap = ClusterMap(
+            self.seeds, password="blubber", username='blarg'
+        )
 
         result = clustermap._fetch_map()
 
         self.assertEqual(result, self.map)
         conn1.write.assert_called_with(b'CLUSTER', b'SLOTS')
         self.assertTrue(conn1.close.called)
-        self.connection_mock.assert_called_with(host='host1', port=12345, encoding='utf-8', password='blubber')
+        self.connection_mock.assert_called_with(
+            host='host1',
+            port=12345,
+            encoding='utf-8',
+            password='blubber',
+            username='blarg'
+        )
 
     def test__fetch_map_second_try_ok(self):
         conn1 = Mock()
@@ -162,9 +170,27 @@ class TestClusterMap(TestCase):
         self.assertRaises(PyRedisError, clustermap._fetch_map)
 
         self.connection_mock.assert_has_calls([
-            call(host='host1', port=12345, encoding='utf-8', password=None),
-            call(host='host2', port=12345, encoding='utf-8', password=None),
-            call(host='host3', port=12345, encoding='utf-8', password=None)
+            call(
+                host='host1',
+                port=12345,
+                encoding='utf-8',
+                password=None,
+                username=None
+            ),
+            call(
+                host='host2',
+                port=12345,
+                encoding='utf-8',
+                password=None,
+                username=None
+            ),
+            call(
+                host='host3',
+                port=12345,
+                encoding='utf-8',
+                password=None,
+                username=None
+            ),
         ])
 
         conn1.write.assert_called_with(b'CLUSTER', b'SLOTS')

@@ -76,6 +76,15 @@ class TestConnectionUnit(TestCase):
         connection._authenticate()
         connection.write.assert_called_with('AUTH', 'testpass')
 
+    def test__authenticate_acl_ok(self):
+        connection = pyredis.connection.Connection(host='127.0.0.1', password='testpass', username='username')
+        connection.write = Mock()
+        connection.read = Mock()
+        connection.read.return_value = b'OK'
+        connection._sock = Mock()
+        connection._authenticate()
+        connection.write.assert_called_with('AUTH', 'username', 'testpass')
+
     def test__authenticate_exception(self):
         connection = pyredis.connection.Connection(host='127.0.0.1', password='testpass')
         connection.write = Mock()
@@ -282,8 +291,8 @@ class TestConnectionUnit(TestCase):
         self.assertIsNone(connection._reader)
         self.assertTrue(connection._closed)
 
-    def test__setdb(self):
-        connection = pyredis.connection.Connection(host='localhost')
+    def test__setdb_0(self):
+        connection = pyredis.connection.Connection(host='localhost', database=0)
         connection.read = Mock()
         connection.read.return_value = b'OK'
         connection.write = Mock()
@@ -291,6 +300,15 @@ class TestConnectionUnit(TestCase):
         connection._setdb()
         connection.write.assert_called_with('SELECT', 0)
         connection.read.assert_called_with()
+
+    def test__setdb_none(self):
+        connection = pyredis.connection.Connection(host='localhost')
+        connection.read = Mock()
+        connection.read.return_value = b'OK'
+        connection.write = Mock()
+        connection._sock = Mock()
+        connection.write.assert_not_called()
+        connection.read.assert_not_called()
 
     def test__setdb_invalid_db(self):
         connection = pyredis.connection.Connection(host='localhost', database=23234)

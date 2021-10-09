@@ -1,0 +1,8 @@
+.idea
+benchmark
+commands.json
+dist
+docs/build
+init.sh
+*__pycache__*
+python_redis.egg-info/

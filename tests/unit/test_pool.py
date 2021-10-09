@@ -191,18 +191,30 @@ class TestClusterPoolUnit(TestCase):
 
         self.addCleanup(patch.stopall)
 
-        self.pool = pyredis.pool.ClusterPool(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
-                                             password='blubber')
+        self.pool = pyredis.pool.ClusterPool(
+            seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
+            password='blubber'
+        )
+
 
     def test___init__(self):
-        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
-                                         password='blubber')
+        self.map_mock.assert_called_with(
+            seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
+            password='blubber',
+            username=None
+        )
         self.assertEqual(self.pool._map, self.map_mock_inst)
         self.assertFalse(self.pool.slave_ok)
 
     def test___init__slave_ok_true(self):
-        self.pool = pyredis.pool.ClusterPool(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)], slave_ok=True)
-        self.map_mock.assert_called_with(seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)], password=None)
+        self.pool = pyredis.pool.ClusterPool(
+            seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
+            slave_ok=True)
+        self.map_mock.assert_called_with(
+            seeds=[('seed1', 12345), ('seed2', 12345), ('seed3', 12345)],
+            password=None,
+            username=None
+        )
         self.assertEqual(self.pool._map, self.map_mock_inst)
         self.assertTrue(self.pool.slave_ok)
 
@@ -215,7 +227,9 @@ class TestClusterPoolUnit(TestCase):
             cluster_map=self.pool._map,
             encoding=None,
             slave_ok=False,
-            database=0)
+            database=0,
+            username=None
+        )
         self.assertEqual(self.client_mock_inst, client)
 
 
@@ -242,7 +256,8 @@ class TestHashPoolUnit(TestCase):
             password=self.pool.password,
             encoding=self.pool.encoding,
             conn_timeout=self.pool.conn_timeout,
-            read_timeout=self.pool.read_timeout
+            read_timeout=self.pool.read_timeout,
+            username=None
         )
         self.assertEqual(client, client_mock)
 
@@ -291,7 +306,8 @@ class TestPoolUnit(TestCase):
             password=self.pool.password,
             encoding=self.pool.encoding,
             conn_timeout=self.pool.conn_timeout,
-            read_timeout=self.pool.read_timeout
+            read_timeout=self.pool.read_timeout,
+            username=None
         )
         self.assertEqual(client, client_mock)
 
@@ -315,7 +331,11 @@ class TestSentinelPoolUnit(TestCase):
     def test___init__default_args(self):
         pool = pyredis.pool.SentinelPool(sentinels=[('host1', 12345)], name='mymaster')
         pool._sentinel.sentinels = [('host1', 12345)]
-        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)], password=None)
+        self.sentinelclient_mock.assert_called_with(
+            sentinels=[('host1', 12345)],
+            password=None,
+            username=None
+        )
         self.assertEqual(pool.name, 'mymaster')
         self.assertEqual(pool.retries, 3)
         self.assertFalse(pool.slave_ok)
@@ -328,10 +348,15 @@ class TestSentinelPoolUnit(TestCase):
             name='mymaster',
             slave_ok=True,
             retries=5,
-            sentinel_password='blubber'
+            sentinel_password='blubber',
+            sentinel_username = 'blarg'
         )
         pool._sentinel.sentinels = [('host1', 12345)]
-        self.sentinelclient_mock.assert_called_with(sentinels=[('host1', 12345)], password='blubber')
+        self.sentinelclient_mock.assert_called_with(
+            sentinels=[('host1', 12345)],
+            password='blubber',
+            username='blarg'
+        )
         self.assertEqual(pool.name, 'mymaster')
         self.assertEqual(pool.retries, 5)
         self.assertTrue(pool.slave_ok)
@@ -420,7 +445,8 @@ class TestSentinelPoolUnit(TestCase):
             host='host1',
             encoding=None,
             database=0,
-            port=12345
+            port=12345,
+            username=None
         )
         self.assertEqual(client, client_mock)
 

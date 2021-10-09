@@ -188,9 +188,36 @@ class TestHashClientUnit(TestCase):
 
         self.assertEqual(client._conn_names, ['localhost_7001', 'localhost_7002', 'localhost_7003'])
         self.connection_mock.assert_has_calls([
-            call(host='localhost', port=7001, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2),
-            call(host='localhost', port=7002, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2),
-            call(host='localhost', port=7003, conn_timeout=2, database=0, encoding=None, password=None, read_timeout=2)
+            call(
+                host='localhost',
+                port=7001,
+                conn_timeout=2,
+                database=None,
+                encoding=None,
+                password=None,
+                read_timeout=2,
+                username=None
+            ),
+            call(
+                host='localhost',
+                port=7002,
+                conn_timeout=2,
+                database=None,
+                encoding=None,
+                password=None,
+                read_timeout=2,
+                username=None
+            ),
+            call(
+                host='localhost',
+                port=7003,
+                conn_timeout=2,
+                database=None,
+                encoding=None,
+                password=None,
+                read_timeout=2,
+                username=None
+            ),
         ])
         self.assertEqual(client._map[0], 'localhost_7001')
         self.assertEqual(client._map[1], 'localhost_7002')
@@ -475,7 +502,7 @@ class TestSentinelClientUnit(TestCase):
 
         self.assertTrue(client._sentinel_connect(sentinel=('host1', 12345)))
         self.connection_mock.assert_called_with(
-            host='host1', port=12345, conn_timeout=0.1, sentinel=True, password='blubber')
+            host='host1', port=12345, conn_timeout=0.1, sentinel=True, password='blubber', username=None)
         client.execute.assert_called_with('PING')
         self.assertEqual(client._conn, conn_mock)
 
@@ -490,7 +517,7 @@ class TestSentinelClientUnit(TestCase):
 
         self.assertFalse(client._sentinel_connect(sentinel=('host1', 12345)))
         self.connection_mock.assert_called_with(
-            host='host1', port=12345, conn_timeout=0.1, sentinel=True, password=None)
+            host='host1', port=12345, conn_timeout=0.1, sentinel=True, password=None, username=None)
         client.execute.assert_called_with('PING')
         client.close.assert_called_with()
 
@@ -725,6 +752,7 @@ class TestClusterClientUnit(TestCase):
             encoding=self.client._encoding,
             password=self.client._password,
             database=self.client._database,
+            username=self.client._username
         )
 
     def test__get_slot_info(self):

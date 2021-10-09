@@ -33,7 +33,7 @@ class Connection(object):
     :type unix_sock: str
 
     :param database:
-        Select which db should be used for this connection
+        Select which db should be used for this connection, defaults to None, so we use the default database 0
     :type database: int
 
     :param password:
@@ -56,19 +56,25 @@ class Connection(object):
         If True, authentication and database selection is skipped.
     :type sentinel: bool
 
+    :param username:
+        Username used for acl scl authentication. If not set, fall back use legacy auth.
+    :type username: str
+
     """
     def __init__(
             self,
             host=None,
             port=6379,
             unix_sock=None,
-            database=0,
+            database=None,
             password=None,
             encoding=None,
             conn_timeout=2,
             read_only=False,
             read_timeout=2,
-            sentinel=False):
+            sentinel=False,
+            username=None
+    ):
 
         if not bool(host) != bool(unix_sock):
             raise PyRedisError('Ether host or unix_sock has to be provided')
@@ -85,10 +91,18 @@ class Connection(object):
         self.port = port
         self.unix_sock = unix_sock
         self.password = password
+        self.username = username
         self.database = database
 
     def _authenticate(self):
-        if self.password:
+        if self.username and self.password:
+            self.write('AUTH', self.username, self.password)
+            try:
+                self.read()
+            except ReplyError as err:
+                self.close()
+                raise err
+        elif self.password:
             self.write('AUTH', self.password)
             try:
                 self.read()
@@ -162,6 +176,8 @@ class Connection(object):
 
     def _setdb(self):
         if self._sentinel:
+            return
+        if self.database is None:
             return
         self._sock.settimeout(0.1)
         self.write('SELECT', self.database)

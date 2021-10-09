@@ -40,6 +40,9 @@ class BasePool(object):
         Class implementing a Lock.
     :type lock: _lock object, defaults to threading.Lock
 
+    :param username:
+        Username used for acl scl authentication. If not set, fall back use legacy auth.
+    :type username: str
     """
     def __init__(
             self,
@@ -49,7 +52,9 @@ class BasePool(object):
             conn_timeout=2,
             read_timeout=2,
             pool_size=16,
-            lock=threading.Lock()):
+            lock=threading.Lock(),
+            username=None
+    ):
         self._conn_timeout = conn_timeout
         self._read_timeout = read_timeout
         self._lock = lock
@@ -61,6 +66,7 @@ class BasePool(object):
         self._pool_size = pool_size
         self._close_on_err = False
         self._cluster = False
+        self._username = username
 
     @property
     def conn_timeout(self):
@@ -133,6 +139,10 @@ class BasePool(object):
     @property
     def close_on_err(self):
         return self._close_on_err
+
+    @property
+    def username(self):
+        return self._username
 
     def _connect(self):
         raise NotImplemented
@@ -213,9 +223,18 @@ class ClusterPool(
     :type retries: int
     """
 
-    def __init__(self, seeds, slave_ok=False, password=None, **kwargs):
+    def __init__(
+            self,
+            seeds,
+            slave_ok=False,
+            password=None,
+            username=None,
+            **kwargs
+    ):
         super().__init__(password=password, **kwargs)
-        self._map = ClusterMap(seeds=seeds, password=password)
+        self._map = ClusterMap(
+            seeds=seeds, password=password, username=username
+        )
         self._slave_ok = slave_ok
         self._cluster = True
 
@@ -235,7 +254,8 @@ class ClusterPool(
             slave_ok=self.slave_ok,
             conn_timeout=self.conn_timeout,
             read_timeout=self.read_timeout,
-            cluster_map=self._map
+            cluster_map=self._map,
+            username=self.username
         )
 
     def execute(self, *args, **kwargs):
@@ -310,7 +330,8 @@ class HashPool(
             password=self.password,
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
-            read_timeout=self.read_timeout
+            read_timeout=self.read_timeout,
+            username=self.username
         )
 
     def execute(self, *args, **kwargs):
@@ -401,7 +422,8 @@ class Pool(
             password=self.password,
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
-            read_timeout=self.read_timeout
+            read_timeout=self.read_timeout,
+            username=self.username
             )
 
     def execute(self, *args):
@@ -456,10 +478,28 @@ class SentinelHashPool(
         Password used for authentication of Sentinel instance itself. If None, no authentication is done.
         Only available starting with Redis 5.0.1.
     :type sentinel_password: str
+
+    :param sentinel_username:
+        Username used for acl style authentication of Sentinel instance itself. If None, no authentication is done.
+        Only available starting with Redis 5.0.1.
+    :type sentinel_username: str
     """
-    def __init__(self, sentinels, buckets, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
+    def __init__(
+            self,
+            sentinels,
+            buckets,
+            slave_ok=False,
+            retries=3,
+            sentinel_password=None,
+            sentinel_username=None,
+            **kwargs
+    ):
         super().__init__(**kwargs)
-        self._sentinel = SentinelClient(sentinels=sentinels, password=sentinel_password)
+        self._sentinel = SentinelClient(
+            sentinels=sentinels,
+            password=sentinel_password,
+            username=sentinel_username
+        )
         self._buckets = buckets
         self._slave_ok = slave_ok
         self._retries = retries
@@ -506,17 +546,6 @@ class SentinelHashPool(
         if client:
             return client
 
-    def _get_client(self, host, port):
-        return Client(
-            host=host,
-            port=port,
-            database=self.database,
-            password=self.password,
-            encoding=self.encoding,
-            conn_timeout=self.conn_timeout,
-            read_timeout=self.read_timeout
-        )
-
     def _get_hash_client(self, buckets):
         return HashClient(
             buckets=buckets,
@@ -524,7 +553,8 @@ class SentinelHashPool(
             password=self.password,
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
-            read_timeout=self.read_timeout
+            read_timeout=self.read_timeout,
+            username=self.username
         )
 
     def _get_master(self, bucket):
@@ -622,10 +652,28 @@ class SentinelPool(
         Password used for authentication of Sentinel instance itself. If None, no authentication is done.
         Only available starting with Redis 5.0.1.
     :type sentinel_password: str
+
+    :param sentinel_username:
+        Username used for acl style authentication of Sentinel instance itself. If None, no authentication is done.
+        Only available starting with Redis 5.0.1.
+    :type sentinel_username: str
     """
-    def __init__(self, sentinels, name, slave_ok=False, retries=3, sentinel_password=None, **kwargs):
+    def __init__(
+            self,
+            sentinels,
+            name,
+            slave_ok=False,
+            retries=3,
+            sentinel_password=None,
+            sentinel_username=None,
+            **kwargs
+    ):
         super().__init__(**kwargs)
-        self._sentinel = SentinelClient(sentinels=sentinels, password=sentinel_password)
+        self._sentinel = SentinelClient(
+            sentinels=sentinels,
+            password=sentinel_password,
+            username=sentinel_username
+        )
         self._name = name
         self._slave_ok = slave_ok
         self._retries = retries
@@ -681,7 +729,8 @@ class SentinelPool(
             password=self.password,
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
-            read_timeout=self.read_timeout
+            read_timeout=self.read_timeout,
+            username=self.username
         )
 
     def _get_master(self):
