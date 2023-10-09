@@ -2,20 +2,16 @@ import sys
 from io import BytesIO
 from pyredis.exceptions import ProtocolError, ReplyError
 
-SYM_CRLF = b'\r\n'
-SYM_EMPTY = b''
+SYM_CRLF = b"\r\n"
+SYM_EMPTY = b""
 
-TYPE_SIMPLE = b'+'
-TYPE_ERROR = b'-'
-TYPE_INT = b':'
-TYPE_BULK = b'$'
-TYPE_ARRAY = b'*'
+TYPE_SIMPLE = b"+"
+TYPE_ERROR = b"-"
+TYPE_INT = b":"
+TYPE_BULK = b"$"
+TYPE_ARRAY = b"*"
 
-__all__ = [
-    'to_bytes',
-    'Reader',
-    'writer'
-]
+__all__ = ["to_bytes", "Reader", "writer"]
 
 
 def is_exception(inst, classinfo):
@@ -25,14 +21,16 @@ def is_exception(inst, classinfo):
         else:
             raise TypeError()
     except TypeError:
-        if isinstance(inst('test'), classinfo):
+        if isinstance(inst("test"), classinfo):
             return True
         else:
-            raise TypeError('{0} is not a subclass of {1}'.format(inst, classinfo))
+            raise TypeError("{0} is not a subclass of {1}".format(inst, classinfo))
 
 
 class ReplyParser(object):
-    def __init__(self, encoding, source, protocol_error=ProtocolError, reply_error=ReplyError):
+    def __init__(
+        self, encoding, source, protocol_error=ProtocolError, reply_error=ReplyError
+    ):
         self._len = 0
         self._nested_parser = None
         self._encoding = encoding
@@ -41,7 +39,7 @@ class ReplyParser(object):
         self._todo = self.header
         self._source = source
         self.complete = False
-        self.result = b''
+        self.result = b""
 
     def decode(self, data):
         if self._encoding:
@@ -67,7 +65,9 @@ class ReplyParser(object):
         elif byte == SYM_EMPTY:
             return None
         else:
-            raise self._protocol_error('Protocol error, got {0} as reply type byte'.format(byte))
+            raise self._protocol_error(
+                "Protocol error, got {0} as reply type byte".format(byte)
+            )
 
     def parse(self):
         while not self.complete:
@@ -96,7 +96,7 @@ class ReplyParser(object):
                         self._encoding,
                         self._source,
                         self._protocol_error,
-                        self._reply_error
+                        self._reply_error,
                     )
                 result = self._nested_parser.parse()
                 if result:
@@ -112,7 +112,7 @@ class ReplyParser(object):
     def parse_bulk(self):
         if not self._len:
             bulk_len = self.readline()
-            if bulk_len == b'-1':
+            if bulk_len == b"-1":
                 self.complete = True
                 self.result = None
                 return True
@@ -151,7 +151,7 @@ class ReplyParser(object):
         self.result += self._source.readline()
         if self.result.endswith(SYM_CRLF):
             result = self.result.rstrip(SYM_CRLF)
-            self.result = b''
+            self.result = b""
             return result
 
     def reset(self):
@@ -159,11 +159,13 @@ class ReplyParser(object):
         self._todo = self.header
         self._nested_parser = None
         self.complete = False
-        self.result = b''
+        self.result = b""
 
 
 class Reader(object):
-    def __init__(self, encoding=None, protocolError=ProtocolError, replyError=ReplyError):
+    def __init__(
+        self, encoding=None, protocolError=ProtocolError, replyError=ReplyError
+    ):
         self._buffer = BytesIO()
         self._buffer_pos = 0
         self._encoding = encoding
@@ -172,10 +174,7 @@ class Reader(object):
         if is_exception(replyError, Exception):
             self._reply_error = replyError
         self._replyparser = ReplyParser(
-            self._encoding,
-            self._buffer,
-            self._protocol_error,
-            self._reply_error
+            self._encoding, self._buffer, self._protocol_error, self._reply_error
         )
 
     def _truncate(self):
@@ -189,17 +188,16 @@ class Reader(object):
 
     def feed(self, data, offset=None, length=None):
         if offset and length:
-            if (offset + length > len(data)) or \
-                    (offset or length) < 0:
-                raise ValueError('offset+length bigger then available date')
+            if (offset + length > len(data)) or (offset or length) < 0:
+                raise ValueError("offset+length bigger then available date")
             data = data[offset:][:length]
         elif offset:
             if (offset > len(data)) or (offset < 0):
-                raise ValueError('offset bigger then available data')
+                raise ValueError("offset bigger then available data")
             data = data[offset:]
         elif length:
             if (length > len(data)) or (length < 0):
-                raise ValueError('length bigger then available data')
+                raise ValueError("length bigger then available data")
             data = data[:length]
         self._buffer.seek(0, 2)
         self._buffer.write(data)
@@ -224,26 +222,18 @@ def to_bytes(value):
     elif isinstance(value, (int, float)):
         return str(value).encode()
     else:
-        raise ValueError('Unsupported value, has to be a instance of bytes, str, int or float')
+        raise ValueError(
+            "Unsupported value, has to be a instance of bytes, str, int or float"
+        )
 
 
 def writer(*args):
     buf = list()
     extend = buf.extend
 
-    extend((
-        TYPE_ARRAY,
-        str(len(args)).encode(),
-        SYM_CRLF
-    ))
+    extend((TYPE_ARRAY, str(len(args)).encode(), SYM_CRLF))
 
     for member in map(to_bytes, args):
-        extend((
-            TYPE_BULK,
-            str(len(member)).encode(),
-            SYM_CRLF,
-            member,
-            SYM_CRLF
-        ))
+        extend((TYPE_BULK, str(len(member)).encode(), SYM_CRLF, member, SYM_CRLF))
 
-    return b''.join(buf)
+    return b"".join(buf)

@@ -1,4 +1,5 @@
 .idea
+.eggs
 benchmark
 commands.json
 dist

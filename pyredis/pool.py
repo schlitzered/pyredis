@@ -7,7 +7,7 @@ from pyredis.helper import ClusterMap
 
 
 class BasePool(object):
-    """ Base Class for all other pools.
+    """Base Class for all other pools.
 
     All other pools inherit from this base class.
     This class itself, cannot be used directly.
@@ -44,16 +44,17 @@ class BasePool(object):
         Username used for acl scl authentication. If not set, fall back use legacy auth.
     :type username: str
     """
+
     def __init__(
-            self,
-            database=0,
-            password=None,
-            encoding=None,
-            conn_timeout=2,
-            read_timeout=2,
-            pool_size=16,
-            lock=threading.Lock(),
-            username=None
+        self,
+        database=0,
+        password=None,
+        encoding=None,
+        conn_timeout=2,
+        read_timeout=2,
+        pool_size=16,
+        lock=threading.Lock(),
+        username=None,
     ):
         self._conn_timeout = conn_timeout
         self._read_timeout = read_timeout
@@ -70,7 +71,7 @@ class BasePool(object):
 
     @property
     def conn_timeout(self):
-        """ Return configured connection timeout
+        """Return configured connection timeout
 
         :return: float
         """
@@ -78,7 +79,7 @@ class BasePool(object):
 
     @property
     def read_timeout(self):
-        """ Return configured read timeout
+        """Return configured read timeout
 
         :return: float
         """
@@ -86,7 +87,7 @@ class BasePool(object):
 
     @property
     def database(self):
-        """ Return configured database.
+        """Return configured database.
 
         :return: int
         """
@@ -94,7 +95,7 @@ class BasePool(object):
 
     @property
     def password(self):
-        """ Return configured password for this pool.
+        """Return configured password for this pool.
 
         :return: str, None
         """
@@ -102,7 +103,7 @@ class BasePool(object):
 
     @property
     def encoding(self):
-        """ Return configured encoding
+        """Return configured encoding
 
         :return: str, None
         """
@@ -110,7 +111,7 @@ class BasePool(object):
 
     @property
     def pool_size(self):
-        """ Return, or adjust the current pool size.
+        """Return, or adjust the current pool size.
 
         shrinking is implemented via closing unused connections.
         if there not enough unused connections to fulfil the shrink request,
@@ -148,7 +149,7 @@ class BasePool(object):
         raise NotImplemented
 
     def acquire(self):
-        """ Acquire a client connection from the pool.
+        """Acquire a client connection from the pool.
 
         :return: redis.Client, exception
         """
@@ -161,13 +162,15 @@ class BasePool(object):
                 client = self._connect()
                 self._pool_used.add(client)
             else:
-                raise PyRedisError('Max connections {0} exhausted'.format(self.pool_size))
+                raise PyRedisError(
+                    "Max connections {0} exhausted".format(self.pool_size)
+                )
         finally:
             self._lock.release()
         return client
 
     def release(self, conn):
-        """ Return a client connection to the pool.
+        """Return a client connection to the pool.
 
         :param conn:
             redis.Client instance, managed by this pool.
@@ -205,7 +208,7 @@ class ClusterPool(
     commands.SSet,
     commands.String,
 ):
-    """ Redis Cluster Pool.
+    """Redis Cluster Pool.
 
     Inherits all the arguments, methods and attributes from BasePool.
 
@@ -223,24 +226,15 @@ class ClusterPool(
     :type retries: int
     """
 
-    def __init__(
-            self,
-            seeds,
-            slave_ok=False,
-            password=None,
-            username=None,
-            **kwargs
-    ):
+    def __init__(self, seeds, slave_ok=False, password=None, username=None, **kwargs):
         super().__init__(password=password, **kwargs)
-        self._map = ClusterMap(
-            seeds=seeds, password=password, username=username
-        )
+        self._map = ClusterMap(seeds=seeds, password=password, username=username)
         self._slave_ok = slave_ok
         self._cluster = True
 
     @property
     def slave_ok(self):
-        """ True if this pool will return slave connections
+        """True if this pool will return slave connections
 
         :return: bool
         """
@@ -255,11 +249,11 @@ class ClusterPool(
             conn_timeout=self.conn_timeout,
             read_timeout=self.read_timeout,
             cluster_map=self._map,
-            username=self.username
+            username=self.username,
         )
 
     def execute(self, *args, **kwargs):
-        """ Execute arbitrary redis command.
+        """Execute arbitrary redis command.
 
         :param args:
         :type args: list, int, float
@@ -286,10 +280,10 @@ class HashPool(
     commands.SSet,
     commands.String,
 ):
-    """ Pool for straight connections to Redis
+    """Pool for straight connections to Redis
 
     Inherits all the arguments, methods and attributes from BasePool.
-    
+
     The Client will calculate a crc16 hash using the shard_key,
     which is be default the first Key in case the command supports multiple keys.
     If the Key is using the TAG annotation "bla{tag}blarg",
@@ -298,7 +292,7 @@ class HashPool(
     a list with 16384 ('host', port) pairs to the "buckets" parameter.
     If you have less then 16384 ('host', port) pairs, the client will try to
     distribute the key spaces evenly between available pairs.
-    
+
     --- Warning ---
     Since this is static hashing, the the order of pairs has to match on each client you use!
     Also changing the number of pairs will change the mapping between buckets and pairs,
@@ -310,6 +304,7 @@ class HashPool(
         example: [('localhost', 7001), ('localhost', 7002), ('localhost', 7003)]
     :type port: list
     """
+
     def __init__(self, buckets, **kwargs):
         super().__init__(**kwargs)
         self._buckets = buckets
@@ -317,7 +312,7 @@ class HashPool(
 
     @property
     def buckets(self):
-        """ Return configured buckets.
+        """Return configured buckets.
 
         :return: list
         """
@@ -331,11 +326,11 @@ class HashPool(
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
             read_timeout=self.read_timeout,
-            username=self.username
+            username=self.username,
         )
 
     def execute(self, *args, **kwargs):
-        """ Execute arbitrary redis command.
+        """Execute arbitrary redis command.
 
         :param args:
         :type args: list, int, float
@@ -362,7 +357,7 @@ class Pool(
     commands.SSet,
     commands.String,
 ):
-    """ Pool for straight connections to Redis
+    """Pool for straight connections to Redis
 
     Inherits all the arguments, methods and attributes from BasePool.
 
@@ -381,6 +376,7 @@ class Pool(
     :type unix_sock: str
 
     """
+
     def __init__(self, host=None, port=6379, unix_sock=None, **kwargs):
         if not bool(host) != bool(unix_sock):
             raise PyRedisError("Ether host or unix_sock has to be provided")
@@ -391,7 +387,7 @@ class Pool(
 
     @property
     def host(self):
-        """ Return configured host.
+        """Return configured host.
 
         :return: str, None
         """
@@ -399,7 +395,7 @@ class Pool(
 
     @property
     def port(self):
-        """ Return configured port.
+        """Return configured port.
 
         :return: int
         """
@@ -407,7 +403,7 @@ class Pool(
 
     @property
     def unix_sock(self):
-        """ Return configured Unix socket.
+        """Return configured Unix socket.
 
         :return: str, None
         """
@@ -423,11 +419,11 @@ class Pool(
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
             read_timeout=self.read_timeout,
-            username=self.username
-            )
+            username=self.username,
+        )
 
     def execute(self, *args):
-        """ Execute arbitrary redis command.
+        """Execute arbitrary redis command.
 
         :param args:
         :type args: list, int, float
@@ -454,7 +450,7 @@ class SentinelHashPool(
     commands.SSet,
     commands.String,
 ):
-    """ Sentinel backed Pool.
+    """Sentinel backed Pool.
 
     Inherits all the arguments, methods and attributes from BasePool.
 
@@ -484,21 +480,20 @@ class SentinelHashPool(
         Only available starting with Redis 5.0.1.
     :type sentinel_username: str
     """
+
     def __init__(
-            self,
-            sentinels,
-            buckets,
-            slave_ok=False,
-            retries=3,
-            sentinel_password=None,
-            sentinel_username=None,
-            **kwargs
+        self,
+        sentinels,
+        buckets,
+        slave_ok=False,
+        retries=3,
+        sentinel_password=None,
+        sentinel_username=None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         self._sentinel = SentinelClient(
-            sentinels=sentinels,
-            password=sentinel_password,
-            username=sentinel_username
+            sentinels=sentinels, password=sentinel_password, username=sentinel_username
         )
         self._buckets = buckets
         self._slave_ok = slave_ok
@@ -508,7 +503,7 @@ class SentinelHashPool(
 
     @property
     def slave_ok(self):
-        """ True if this pool return slave connections
+        """True if this pool return slave connections
 
         :return: bool
         """
@@ -516,7 +511,7 @@ class SentinelHashPool(
 
     @property
     def buckets(self):
-        """ Name of the configured Sentinel managed cluster.
+        """Name of the configured Sentinel managed cluster.
 
         :return: str
         """
@@ -524,7 +519,7 @@ class SentinelHashPool(
 
     @property
     def retries(self):
-        """ Number of retries in case of stale sentinel.
+        """Number of retries in case of stale sentinel.
 
         :return: int
         """
@@ -532,7 +527,7 @@ class SentinelHashPool(
 
     @property
     def sentinels(self):
-        """ Deque with configured sentinels.
+        """Deque with configured sentinels.
 
         :return: deque
         """
@@ -554,13 +549,13 @@ class SentinelHashPool(
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
             read_timeout=self.read_timeout,
-            username=self.username
+            username=self.username,
         )
 
     def _get_master(self, bucket):
         candidate = self._sentinel.get_master(bucket)
-        host = candidate[b'ip'].decode('utf8')
-        port = int(candidate[b'port'])
+        host = candidate[b"ip"].decode("utf8")
+        port = int(candidate[b"port"])
         return host, port
 
     def _get_masters(self):
@@ -574,15 +569,17 @@ class SentinelHashPool(
                     buckets.append(_bucket)
                     break
                 if _counter == 0:
-                    raise PyRedisConnError("Could not connect to bucket {0}".format(bucket))
+                    raise PyRedisConnError(
+                        "Could not connect to bucket {0}".format(bucket)
+                    )
         return self._get_hash_client(buckets=buckets)
 
     def _get_slave(self, bucket):
         candidates = []
         for candidate in self._sentinel.get_slaves(bucket):
-            candidates.append((candidate[b'ip'], int(candidate[b'port'])))
+            candidates.append((candidate[b"ip"], int(candidate[b"port"])))
         shuffle(candidates)
-        host = candidates[0][0].decode('utf8')
+        host = candidates[0][0].decode("utf8")
         port = int(candidates[0][1])
         return host, port
 
@@ -597,11 +594,13 @@ class SentinelHashPool(
                     buckets.append(_bucket)
                     break
                 if _counter == 0:
-                    raise PyRedisConnError("Could not connect to bucket {0}".format(bucket))
+                    raise PyRedisConnError(
+                        "Could not connect to bucket {0}".format(bucket)
+                    )
         return self._get_hash_client(buckets=buckets)
 
     def execute(self, *args, **kwargs):
-        """ Execute arbitrary redis command.
+        """Execute arbitrary redis command.
 
         :param args:
         :type args: list, int, float
@@ -628,7 +627,7 @@ class SentinelPool(
     commands.SSet,
     commands.String,
 ):
-    """ Sentinel backed Pool.
+    """Sentinel backed Pool.
 
     Inherits all the arguments, methods and attributes from BasePool.
 
@@ -658,21 +657,20 @@ class SentinelPool(
         Only available starting with Redis 5.0.1.
     :type sentinel_username: str
     """
+
     def __init__(
-            self,
-            sentinels,
-            name,
-            slave_ok=False,
-            retries=3,
-            sentinel_password=None,
-            sentinel_username=None,
-            **kwargs
+        self,
+        sentinels,
+        name,
+        slave_ok=False,
+        retries=3,
+        sentinel_password=None,
+        sentinel_username=None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         self._sentinel = SentinelClient(
-            sentinels=sentinels,
-            password=sentinel_password,
-            username=sentinel_username
+            sentinels=sentinels, password=sentinel_password, username=sentinel_username
         )
         self._name = name
         self._slave_ok = slave_ok
@@ -681,7 +679,7 @@ class SentinelPool(
 
     @property
     def slave_ok(self):
-        """ True if this pool return slave connections
+        """True if this pool return slave connections
 
         :return: bool
         """
@@ -689,7 +687,7 @@ class SentinelPool(
 
     @property
     def name(self):
-        """ Name of the configured Sentinel managed cluster.
+        """Name of the configured Sentinel managed cluster.
 
         :return: str
         """
@@ -697,7 +695,7 @@ class SentinelPool(
 
     @property
     def retries(self):
-        """ Number of retries in case of stale sentinel.
+        """Number of retries in case of stale sentinel.
 
         :return: int
         """
@@ -705,7 +703,7 @@ class SentinelPool(
 
     @property
     def sentinels(self):
-        """ Deque with configured sentinels.
+        """Deque with configured sentinels.
 
         :return: deque
         """
@@ -730,20 +728,20 @@ class SentinelPool(
             encoding=self.encoding,
             conn_timeout=self.conn_timeout,
             read_timeout=self.read_timeout,
-            username=self.username
+            username=self.username,
         )
 
     def _get_master(self):
         candidate = self._sentinel.get_master(self.name)
-        host = candidate[b'ip']
-        port = int(candidate[b'port'])
+        host = candidate[b"ip"]
+        port = int(candidate[b"port"])
         client = self._get_client(host, port)
         return client
 
     def _get_slave(self):
         candidates = []
         for candidate in self._sentinel.get_slaves(self.name):
-            candidates.append((candidate[b'ip'], int(candidate[b'port'])))
+            candidates.append((candidate[b"ip"], int(candidate[b"port"])))
         shuffle(candidates)
         host = candidates[0][0]
         port = int(candidates[0][1])
@@ -751,7 +749,7 @@ class SentinelPool(
         return client
 
     def execute(self, *args):
-        """ Execute arbitrary redis command.
+        """Execute arbitrary redis command.
 
         :param args:
         :type args: list, int, float
