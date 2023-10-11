@@ -1,4 +1,4 @@
-__author__ = 'schlitzer'
+__author__ = "schlitzer"
 
 """
 Redis Client implementation for Python 3.
@@ -9,48 +9,56 @@ License: MIT (see LICENSE for details)
 """
 
 from pyredis.exceptions import *
-from pyredis.client import Client, ClusterClient, HashClient, PubSubClient, SentinelClient
-from pyredis.pool import ClusterPool, HashPool, Pool, SentinelHashPool, SentinelPool
+from pyredis.client import Client
+from pyredis.client import ClusterClient
+from pyredis.client import HashClient
+from pyredis.client import PubSubClient
+from pyredis.client import SentinelClient
+from pyredis.pool import ClusterPool
+from pyredis.pool import HashPool
+from pyredis.pool import Pool
+from pyredis.pool import SentinelHashPool
+from pyredis.pool import SentinelPool
 
 __all__ = [
-    'get_by_url',
-    'Client',
-    'ClusterClient',
-    'ClusterPool',
-    'HashClient',
-    'PubSubClient',
-    'SentinelClient',
-    'HashPool',
-    'Pool',
-    'SentinelPool',
-    'SentinelHashPool',
-    'PyRedisConnError',
-    'PyRedisConnReadTimeout',
-    'PyRedisConnClosed',
-    'PyRedisError',
-    'ProtocolError',
-    'ReplyError'
+    "get_by_url",
+    "Client",
+    "ClusterClient",
+    "ClusterPool",
+    "HashClient",
+    "PubSubClient",
+    "SentinelClient",
+    "HashPool",
+    "Pool",
+    "SentinelPool",
+    "SentinelHashPool",
+    "PyRedisConnError",
+    "PyRedisConnReadTimeout",
+    "PyRedisConnClosed",
+    "PyRedisError",
+    "ProtocolError",
+    "ReplyError",
 ]
 
 
 def get_by_url(url):
-    scheme, rest = url.split('://', 1)
+    scheme, rest = url.split("://", 1)
     conns = list()
     kwargs = dict()
-    if '?' in rest:
-        connect, opts = (rest.split('?', 1))
+    if "?" in rest:
+        connect, opts = rest.split("?", 1)
     else:
         connect = rest
         opts = None
     for conn in connect.split(","):
-        conn = conn.rsplit(':', 1)
+        conn = conn.rsplit(":", 1)
         if len(conn) == 2:
             conn[1] = int(conn[1])
         conns.append(conn)
     if opts:
         kwargs = dict()
-        for opt in opts.split('&'):
-            key, value = opt.split('=', 1)
+        for opt in opts.split("&"):
+            key, value = opt.split("=", 1)
             kwargs[key] = _opts_type_helper(key, value)
     try:
         if scheme == "cluster":
@@ -74,16 +82,18 @@ def get_by_url(url):
         else:
             raise PyRedisURLError("invalid schema: {0}")
     except TypeError as err:
-        raise PyRedisURLError("unexpected or missing options specified: {0}".format(err))
+        raise PyRedisURLError(
+            "unexpected or missing options specified: {0}".format(err)
+        )
 
 
 def _opts_type_helper(opt, value):
-    if opt in ['database', 'pool_size', 'retries']:
+    if opt in ["database", "pool_size", "retries"]:
         return int(value)
-    elif opt in ['conn_timeout', 'read_timeout']:
+    elif opt in ["conn_timeout", "read_timeout"]:
         return float(value)
-    elif opt in ['slave_ok']:
-        if value in ['true', 'True', 1]:
+    elif opt in ["slave_ok"]:
+        if value in ["true", "True", 1]:
             return True
         else:
             return False

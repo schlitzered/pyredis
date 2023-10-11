@@ -1,14 +1,14 @@
-__author__ = 'schlitzer'
+__author__ = "schlitzer"
 
 
 __all__ = [
-    'PyRedisError',
-    'PyRedisURLError',
-    'PyRedisConnError',
-    'PyRedisConnClosed',
-    'PyRedisConnReadTimeout',
-    'ProtocolError',
-    'ReplyError'
+    "PyRedisError",
+    "PyRedisURLError",
+    "PyRedisConnError",
+    "PyRedisConnClosed",
+    "PyRedisConnReadTimeout",
+    "ProtocolError",
+    "ReplyError",
 ]
 
 
@@ -35,9 +35,9 @@ class PyRedisConnClosed(PyRedisError):
 try:
     from hiredis import ReplyError, ProtocolError
 except ImportError:
+
     class ReplyError(PyRedisError):
         pass
-
 
     class ProtocolError(PyRedisError):
         pass
