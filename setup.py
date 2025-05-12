@@ -23,10 +23,10 @@ License: MIT (see LICENSE for details)
             'Programming Language :: Python :: 3'
     ],
     setup_requires=[
-        'crc'
+        'crc>=7.0.0'
     ],
     install_requires=[
-        'crc'
+        'crc>=7.0.0'
     ],
     keywords=[
         'redis'

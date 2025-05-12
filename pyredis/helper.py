@@ -9,7 +9,7 @@ from pyredis.exceptions import PyRedisError
 from pyredis.protocol import to_bytes
 
 
-crc16 = crc.Calculator(crc.Crc16.CCITT)
+crc16 = crc.Calculator(crc.Crc16.XMODEM)
 
 
 def dict_from_list(source):
