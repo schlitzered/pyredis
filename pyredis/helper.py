@@ -1,4 +1,4 @@
-import crc
+import binascii
 import random
 from collections import deque
 from threading import Lock
@@ -9,7 +9,6 @@ from pyredis.exceptions import PyRedisError
 from pyredis.protocol import to_bytes
 
 
-crc16 = crc.Calculator(crc.Crc16.CCITT)
 
 
 def dict_from_list(source):
@@ -37,7 +36,7 @@ def tag_from_key(key):
 
 
 def slot_from_key(key):
-    return crc16.checksum(tag_from_key(key)) % 16384
+    return binascii.crc_hqx(tag_from_key(key), 0) % 16384
 
 
 class ClusterMap(object):

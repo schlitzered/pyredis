@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "python_redis"
+version = "0.4.1"
+requires-python = ">=3.9"
+authors = [
+  {name = "Stephan Schultchen", email = "stephan.schultchen@gmail.com"},
+]
+description = "Redis Client"
+dynamic = ["dependencies"]
+license = {file = "LICENSE.txt"}
+keywords = ["redis"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["pyredis"]
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[project.urls]
+Repository = "https://github.com/schlitzered/pyredis"
+Issues = "https://github.com/schlitzered/pyredis/issues"

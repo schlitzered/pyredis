@@ -13,6 +13,7 @@ from pyredis.helper import slot_from_key
 
 class Client(
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -28,6 +29,7 @@ class Client(
 
     Inherits the following Command classes:
       - commands.Connection,
+      - commands.Geo,
       - commands.Hash,
       - commands.HyperLogLog,
       - commands.Key,
@@ -157,6 +159,7 @@ class Client(
 
 class ClusterClient(
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -171,6 +174,7 @@ class ClusterClient(
 
     Inherits the following Commmand classes:
       - commands.Connection,
+      - commands.Geo,
       - commands.Hash,
       - commands.HyperLogLog,
       - commands.Key,
@@ -346,6 +350,7 @@ class ClusterClient(
 
 class HashClient(
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -375,6 +380,7 @@ class HashClient(
 
     Inherits the following Commmand classes:
       - commands.Connection,
+      - commands.Geo,
       - commands.Hash,
       - commands.HyperLogLog,
       - commands.Key,

@@ -15,6 +15,9 @@ class TestConnectionUnit(TestCase):
         socket_patcher = patch('pyredis.connection.socket', autospec=True)
         self.socket_mock = socket_patcher.start()
         self.socket_mock.socket.return_value = Mock()
+        self.socket_mock.timeout = socket.timeout
+        self.socket_mock.gaierror = socket.gaierror
+        self.socket_mock.create_connection.side_effect = lambda *args, **kwargs: self.socket_mock.socket.return_value
 
         reader_patcher = patch('pyredis.connection.Reader', autospec=True)
         self.reader_mock = reader_patcher.start()
@@ -94,93 +97,57 @@ class TestConnectionUnit(TestCase):
         self.assertRaises(ReplyError, connection._authenticate)
         connection.write.assert_called_with('AUTH', 'testpass')
 
-    def test__connect_inet46_ipv4(self):
+    def test__connect_inet46_ok(self):
         connection = pyredis.connection.Connection(host='127.0.0.1')
         sock = connection._connect_inet46()
-        self.socket_mock.socket.assert_called_with(
-            self.socket_mock.AF_INET,
-            self.socket_mock.SOCK_STREAM
+        self.socket_mock.create_connection.assert_called_with(
+            address=('127.0.0.1', 6379),
+            timeout=2
         )
-        sock.settimeout.assert_called_with(2)
-        sock.connect.assert_called_with(('127.0.0.1', 6379))
-        self.assertEqual(sock, self.socket_mock.socket())
+        self.assertEqual(
+            first=sock,
+            second=self.socket_mock.socket.return_value
+        )
 
-    def test__connect_inet46_ipv6(self):
-        sock_mock = Mock()
-        self.socket_mock.socket.side_effect = [socket.gaierror, sock_mock]
-        self.socket_mock.gaierror = socket.gaierror
-
-        connection = pyredis.connection.Connection(host='::1')
-        sock = connection._connect_inet46()
-
-        self.socket_mock.socket.assert_has_calls([
-            call(
-                self.socket_mock.AF_INET,
-                self.socket_mock.SOCK_STREAM
-            ),
-            call(
-                self.socket_mock.AF_INET6,
-                self.socket_mock.SOCK_STREAM
-            )
-        ])
-
-        sock.settimeout.assert_called_with(2)
-        sock.connect.assert_called_with(('::1', 6379))
-        self.assertEqual(sock, sock_mock)
-
-    def test__connect_inet46_no_ipv4_or_ipv6(self):
-        self.socket_mock.socket.side_effect = [socket.gaierror, socket.gaierror]
-        self.socket_mock.gaierror = socket.gaierror
-
-        connection = pyredis.connection.Connection(host='blarg')
-        self.assertRaises(PyRedisConnError, connection._connect_inet46)
+    def test__connect_inet46_OSError(self):
+        self.socket_mock.create_connection.side_effect = OSError
+        connection = pyredis.connection.Connection(host='127.0.0.1')
+        self.assertRaises(
+            PyRedisConnError,
+            connection._connect_inet46
+        )
 
     def test__connect_inet46_socket_timeout(self):
-        sock_mock = Mock()
-        sock_mock.connect.side_effect = socket.timeout
-
-        self.socket_mock.socket.return_value = sock_mock
-        self.socket_mock.gaierror = socket.gaierror
-        self.socket_mock.timeout = socket.timeout
-
+        self.socket_mock.create_connection.side_effect = socket.timeout
         connection = pyredis.connection.Connection(host='127.0.0.1')
-        self.assertRaises(PyRedisConnError, connection._connect_inet46)
+        self.assertRaises(
+            PyRedisConnError,
+            connection._connect_inet46
+        )
 
     def test__connect_inet46_OverflowError(self):
-        sock_mock = Mock()
-        sock_mock.connect.side_effect = OverflowError
-
-        self.socket_mock.gaierror = socket.gaierror
-        self.socket_mock.timeout = socket.timeout
-
-        self.socket_mock.socket.return_value = sock_mock
-
+        self.socket_mock.create_connection.side_effect = OverflowError
         connection = pyredis.connection.Connection(host='127.0.0.1')
-        self.assertRaises(PyRedisConnError, connection._connect_inet46)
+        self.assertRaises(
+            PyRedisConnError,
+            connection._connect_inet46
+        )
 
     def test__connect_inet46_ConnectionRefusedError(self):
-        sock_mock = Mock()
-        sock_mock.connect.side_effect = ConnectionRefusedError
-
-        self.socket_mock.gaierror = socket.gaierror
-        self.socket_mock.timeout = socket.timeout
-
-        self.socket_mock.socket.return_value = sock_mock
-
+        self.socket_mock.create_connection.side_effect = ConnectionRefusedError
         connection = pyredis.connection.Connection(host='127.0.0.1')
-        self.assertRaises(PyRedisConnError, connection._connect_inet46)
+        self.assertRaises(
+            PyRedisConnError,
+            connection._connect_inet46
+        )
 
     def test__connect_inet46_ConnectionAbortedError(self):
-        sock_mock = Mock()
-        sock_mock.connect.side_effect = ConnectionAbortedError
-
-        self.socket_mock.gaierror = socket.gaierror
-        self.socket_mock.timeout = socket.timeout
-
-        self.socket_mock.socket.return_value = sock_mock
-
+        self.socket_mock.create_connection.side_effect = ConnectionAbortedError
         connection = pyredis.connection.Connection(host='127.0.0.1')
-        self.assertRaises(PyRedisConnError, connection._connect_inet46)
+        self.assertRaises(
+            PyRedisConnError,
+            connection._connect_inet46
+        )
 
     def test__connect_unix(self):
         connection = pyredis.connection.Connection(unix_sock='/tmp/test.sock')
