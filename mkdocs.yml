@@ -63,7 +63,12 @@ nav:
 
 plugins:
   - search
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            inherited_members: true
+            show_if_no_docstring: true
 
 markdown_extensions:
   - admonition
