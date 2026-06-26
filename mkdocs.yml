@@ -18,7 +18,48 @@ theme:
 nav:
   - Introduction: index.md
   - Usage Example: example.md
-  - API Documentation: pyredis.md
+  - API Reference:
+      - Connection:
+          - Connection: api/connection/connection.md
+          - AsyncConnection: api/connection/async_connection.md
+      - Clients:
+          - Client: api/client/client.md
+          - AsyncClient: api/client/async_client.md
+          - ClusterClient: api/client/cluster_client.md
+          - AsyncClusterClient: api/client/async_cluster_client.md
+          - HashClient: api/client/hash_client.md
+          - AsyncHashClient: api/client/async_hash_client.md
+          - PubSubClient: api/client/pubsub_client.md
+          - AsyncPubSubClient: api/client/async_pubsub_client.md
+          - SentinelClient: api/client/sentinel_client.md
+          - AsyncSentinelClient: api/client/async_sentinel_client.md
+      - Pools:
+          - BasePool: api/pool/base_pool.md
+          - AsyncBasePool: api/pool/async_base_pool.md
+          - Pool: api/pool/pool.md
+          - AsyncPool: api/pool/async_pool.md
+          - ClusterPool: api/pool/cluster_pool.md
+          - AsyncClusterPool: api/pool/async_cluster_pool.md
+          - HashPool: api/pool/hash_pool.md
+          - AsyncHashPool: api/pool/async_hash_pool.md
+          - SentinelPool: api/pool/sentinel_pool.md
+          - AsyncSentinelPool: api/pool/async_sentinel_pool.md
+          - SentinelHashPool: api/pool/sentinel_hash_pool.md
+          - AsyncSentinelHashPool: api/pool/async_sentinel_hash_pool.md
+      - Commands:
+          - Connection: api/commands/connection.md
+          - Hash: api/commands/hash.md
+          - HyperLogLog: api/commands/hyperloglog.md
+          - Geo: api/commands/geo.md
+          - Key: api/commands/key.md
+          - List: api/commands/list.md
+          - Publish: api/commands/publish.md
+          - Scripting: api/commands/scripting.md
+          - Set: api/commands/set.md
+          - SSet: api/commands/sset.md
+          - String: api/commands/string.md
+          - Subscribe: api/commands/subscribe.md
+          - Transaction: api/commands/transaction.md
 
 plugins:
   - search

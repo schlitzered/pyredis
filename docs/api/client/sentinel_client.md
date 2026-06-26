@@ -1,0 +1,3 @@
+# SentinelClient
+
+::: pyredis.SentinelClient

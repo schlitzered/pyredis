@@ -1,0 +1,3 @@
+# SentinelHashPool
+
+::: pyredis.SentinelHashPool

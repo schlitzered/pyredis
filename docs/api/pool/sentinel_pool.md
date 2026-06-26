@@ -1,0 +1,3 @@
+# SentinelPool
+
+::: pyredis.SentinelPool

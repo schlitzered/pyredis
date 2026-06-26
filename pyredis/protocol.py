@@ -33,10 +33,13 @@ def is_exception(inst, classinfo):
     )
 
 
-
 class ReplyParser(object):
     def __init__(
-        self, encoding, source, protocol_error=ProtocolError, reply_error=ReplyError
+        self,
+        encoding,
+        source,
+        protocol_error=ProtocolError,
+        reply_error=ReplyError
     ):
         self._len = 0
         self._nested_parser = None
@@ -137,7 +140,9 @@ class ReplyParser(object):
         result = self.readline()
         if result:
             self.complete = True
-            self.result = self._reply_error(result.decode(sys.getdefaultencoding()))
+            self.result = self._reply_error(
+                result.decode(sys.getdefaultencoding())
+            )
             return True
 
     def parse_int(self):
@@ -181,7 +186,10 @@ class Reader(object):
         if is_exception(replyError, Exception):
             self._reply_error = replyError
         self._replyparser = ReplyParser(
-            self._encoding, self._buffer, self._protocol_error, self._reply_error
+            encoding=self._encoding,
+            source=self._buffer,
+            protocol_error=self._protocol_error,
+            reply_error=self._reply_error,
         )
 
     def _truncate(self):
@@ -230,7 +238,8 @@ def to_bytes(value):
         return str(value).encode()
     else:
         raise ValueError(
-            "Unsupported value, has to be a instance of bytes, str, int or float"
+            "Unsupported value, has to be a instance of "
+            "bytes, str, int or float"
         )
 
 
@@ -241,6 +250,14 @@ def writer(*args):
     extend((TYPE_ARRAY, str(len(args)).encode(), SYM_CRLF))
 
     for member in map(to_bytes, args):
-        extend((TYPE_BULK, str(len(member)).encode(), SYM_CRLF, member, SYM_CRLF))
+        extend(
+            (
+                TYPE_BULK,
+                str(len(member)).encode(),
+                SYM_CRLF,
+                member,
+                SYM_CRLF,
+            )
+        )
 
     return b"".join(buf)

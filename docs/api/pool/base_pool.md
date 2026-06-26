@@ -1,0 +1,3 @@
+# BasePool
+
+::: pyredis.pool.BasePool

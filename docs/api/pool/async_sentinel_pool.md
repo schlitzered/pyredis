@@ -1,0 +1,3 @@
+# AsyncSentinelPool
+
+::: pyredis.AsyncSentinelPool

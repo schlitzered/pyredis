@@ -1,0 +1,3 @@
+# AsyncHashPool
+
+::: pyredis.AsyncHashPool
