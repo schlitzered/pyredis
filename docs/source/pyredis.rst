@@ -70,7 +70,7 @@ Pool
 SentinelHashPool
 ----------------
 
-.. autoclass:: pyredis.SentinelPool
+.. autoclass:: pyredis.SentinelHashPool
     :members:
 
 SentinelPool
@@ -160,8 +160,3 @@ Transaction
 .. autoclass:: pyredis.commands.Transaction
     :members:
 
-Scripting
----------
-
-.. autoclass:: pyredis.commands.Scripting
-    :members:

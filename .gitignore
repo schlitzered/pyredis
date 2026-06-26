@@ -1,9 +1,5 @@
 .idea
-.eggs
-benchmark
-commands.json
 dist
 docs/build
-init.sh
+venv
 *__pycache__*
-python_redis.egg-info/
