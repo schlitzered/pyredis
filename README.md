@@ -3,15 +3,16 @@
 Redis Client implementation for Python 3.
 
 ## Features
-- Base Redis Client
-- Publish Subscribe Client
-- Sentinel Client
-- Connection Pool
-- Sentinel Backed Connection Pool
-- Client & Pool for Redis Cluster
-- Bulk Mode (Not supported with Redis Cluster)
-- Client & Pool with Static Hash Cluster (Supports Bulk Mode)
-- Sentinel Backed Pool with Static Hash Cluster (Supports Bulk Mode)
+- Complete Synchronous and Asynchronous (asyncio) counterparts for all client and pool classes.
+- Base Redis Client & AsyncClient
+- Publish Subscribe Client & AsyncPubSubClient
+- Sentinel Client & AsyncSentinelClient
+- Connection Pool & AsyncPool
+- Sentinel Backed Connection Pool & AsyncSentinelPool
+- Client & Pool for Redis Cluster & AsyncClusterPool
+- Bulk Mode (Sync & Async, not supported with Redis Cluster)
+- Client & Pool with Static Hash Cluster & AsyncHashPool
+- Sentinel Backed Pool with Static Hash Cluster & AsyncSentinelHashPool
 
 ## Documentation
 Documentation can be found on GitHub Pages:
