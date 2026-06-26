@@ -3,6 +3,13 @@ from pyredis.exceptions import PyRedisError
 
 
 class BasePool(object):
+    """
+    Base connection pool for synchronous Redis clients.
+
+    Manages a pool of free and used connections, handling acquisition, release,
+    and automatic scaling up to the configured pool limit.
+    """
+
     def __init__(
         self,
         database=0,

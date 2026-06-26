@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class SSet(BaseCommand):
+    """Mixin for Redis Sorted Set commands (e.g. ZADD, ZREM, ZRANGE, ZSCORE)."""
+
     def __init__(self):
         super().__init__()
 

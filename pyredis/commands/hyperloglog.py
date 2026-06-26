@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class HyperLogLog(BaseCommand):
+    """Mixin for Redis HyperLogLog cardinality estimation commands (e.g. PFADD, PFCOUNT)."""
+
     def __init__(self):
         super().__init__()
 

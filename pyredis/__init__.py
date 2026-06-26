@@ -71,6 +71,19 @@ def get_by_url(
     url,
     async_client=False
 ):
+    """
+    Get a Redis client or connection pool based on the specified URL scheme.
+
+    Supported Schemes:
+        redis://     - Returns a Pool or AsyncPool
+        cluster://   - Returns a ClusterPool or AsyncClusterPool
+        sentinel://  - Returns a SentinelPool/SentinelHashPool or async counterpart
+        pubsub://    - Returns a PubSubClient or AsyncPubSubClient
+
+    Args:
+        url: The URL containing connection information and options.
+        async_client: If True, returns the asynchronous pool or client variant.
+    """
     scheme, rest = url.split("://", 1)
     conns = list()
     kwargs = dict()

@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Connection(BaseCommand):
+    """Mixin for Redis Connection commands (e.g. PING, ECHO)."""
+
     def __init__(self):
         super().__init__()
 

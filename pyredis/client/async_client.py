@@ -16,6 +16,13 @@ class AsyncClient(
     commands.String,
     commands.Transaction,
 ):
+    """
+    Asynchronous Redis Client.
+
+    Handles connection lifecycle and command execution asynchronously,
+    inheriting all standard Redis command mixins.
+    """
+
     def __init__(self, **kwargs):
         super().__init__()
         self._conn = AsyncConnection(**kwargs)

@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Key(BaseCommand):
+    """Mixin for Redis Key-level commands (e.g. EXISTS, DEL, EXPIRE, TTL, TYPE)."""
+
     def __init__(self):
         super().__init__()
 

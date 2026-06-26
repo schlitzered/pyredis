@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class List(BaseCommand):
+    """Mixin for Redis List commands (e.g. LPUSH, LPOP, LRANGE)."""
+
     def __init__(self):
         super().__init__()
 

@@ -16,6 +16,13 @@ class ClusterPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Synchronous Redis Cluster Connection Pool.
+
+    Acts as a proxy for client commands, leasing a synchronous ClusterClient
+    for cluster-routed operations and releasing it back to the pool.
+    """
+
     def __init__(
         self,
         seeds,

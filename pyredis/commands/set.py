@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Set(BaseCommand):
+    """Mixin for Redis Set (unordered unique collections) commands (e.g. SADD, SREM, SMEMBERS)."""
+
     def __init__(self):
         super().__init__()
 

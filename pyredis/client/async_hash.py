@@ -19,6 +19,13 @@ class AsyncHashClient(
     commands.String,
     commands.Transaction,
 ):
+    """
+    Asynchronous Redis Client Hashing across multiple buckets.
+
+    Determines connection socket for a command by calculating the keyspace slot from 
+    the shard_key and mapping it to one of the configured server buckets asynchronously.
+    """
+
     def __init__(
         self,
         buckets,

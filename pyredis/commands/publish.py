@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Publish(BaseCommand):
+    """Mixin for Redis message publishing commands (PUBLISH)."""
+
     def __init__(self):
         super().__init__()
 

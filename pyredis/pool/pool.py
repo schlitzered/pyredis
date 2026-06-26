@@ -18,6 +18,13 @@ class Pool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Synchronous Redis Connection Pool.
+
+    Acts as a proxy for client commands, lease-acquiring a synchronous connection for
+    each command and releasing it back to the pool afterwards.
+    """
+
     def __init__(self, host=None, port=6379, unix_sock=None, **kwargs):
         if not bool(host) != bool(unix_sock):
             raise PyRedisError("Ether host or unix_sock has to be provided")

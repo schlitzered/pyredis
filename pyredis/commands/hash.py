@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Hash(BaseCommand):
+    """Mixin for Redis Hash commands (e.g. HGET, HSET, HDEL)."""
+
     def __init__(self):
         super().__init__()
 

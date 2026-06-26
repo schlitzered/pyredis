@@ -16,6 +16,13 @@ class AsyncClusterPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Asynchronous Redis Cluster Connection Pool.
+
+    Acts as a proxy for client commands, leasing an asynchronous AsyncClusterClient
+    for cluster-routed operations and releasing it back to the pool asynchronously.
+    """
+
     def __init__(
         self,
         seeds,

@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class String(BaseCommand):
+    """Mixin for Redis String and binary value commands (e.g. GET, SET, INCR, APPEND)."""
+
     def __init__(self):
         super().__init__()
 

@@ -18,6 +18,13 @@ class AsyncSentinelPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Asynchronous Redis Sentinel Connection Pool.
+
+    Provides automatic discovery and failover-routing of Redis master/slave
+    connections asynchronously using an AsyncSentinelClient to resolve host locations.
+    """
+
     def __init__(
         self,
         sentinels,

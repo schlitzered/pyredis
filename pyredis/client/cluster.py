@@ -19,6 +19,13 @@ class ClusterClient(
     commands.String,
     commands.Transaction,
 ):
+    """
+    Synchronous Redis Cluster Client.
+
+    Automatically routes Redis commands to appropriate cluster nodes
+    by tracking keyspace slots via a ClusterMap. Handles MOVED and ASK redirection.
+    """
+
     def __init__(
         self,
         seeds=None,

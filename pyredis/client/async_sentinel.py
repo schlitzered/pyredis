@@ -4,6 +4,12 @@ from pyredis.exceptions import PyRedisConnError
 
 
 class AsyncSentinelClient(object):
+    """
+    Asynchronous Redis Sentinel Client.
+
+    Handles connectivity to Sentinel nodes and master/slave service discovery asynchronously.
+    """
+
     def __init__(self, sentinels, password=None, username=None):
         self._conn = None
         self._sentinels = deque(sentinels)

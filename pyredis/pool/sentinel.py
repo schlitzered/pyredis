@@ -18,6 +18,13 @@ class SentinelPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Synchronous Redis Sentinel Connection Pool.
+
+    Provides automatic discovery and failover-routing of Redis master/slave
+    connections using a SentinelClient to resolve host locations.
+    """
+
     def __init__(
         self,
         sentinels,

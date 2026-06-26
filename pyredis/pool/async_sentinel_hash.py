@@ -18,6 +18,13 @@ class AsyncSentinelHashPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Asynchronous Redis Sentinel-Backed Hashed Connection Pool.
+
+    Combines Sentinel discovery with client-side hashing to route commands across
+    multiple master/slave sentinel-monitored clusters asynchronously.
+    """
+
     def __init__(
         self,
         sentinels,

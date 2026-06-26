@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Geo(BaseCommand):
+    """Mixin for Redis Geo (spatial/geographic) commands (e.g. GEOADD, GEODIST)."""
+
     def __init__(self):
         super().__init__()
 

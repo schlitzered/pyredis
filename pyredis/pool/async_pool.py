@@ -18,6 +18,13 @@ class AsyncPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Asynchronous Redis Connection Pool.
+
+    Acts as a proxy for client commands, lease-acquiring an asynchronous connection for
+    each command and releasing it back to the pool afterwards asynchronously.
+    """
+
     def __init__(
         self,
         host=None,

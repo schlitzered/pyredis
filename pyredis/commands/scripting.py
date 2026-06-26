@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Scripting(BaseCommand):
+    """Mixin for Redis Lua scripting commands (e.g. EVAL, EVALSHA, SCRIPT LOAD)."""
+
     def __init__(self):
         super().__init__()
 

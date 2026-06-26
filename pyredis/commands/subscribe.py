@@ -1,4 +1,6 @@
 class Subscribe(object):
+    """Mixin for Redis subscription client commands (e.g. SUBSCRIBE, UNSUBSCRIBE)."""
+
     def write(self, *args):
         raise NotImplementedError
 

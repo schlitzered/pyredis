@@ -19,6 +19,13 @@ class AsyncClusterClient(
     commands.String,
     commands.Transaction,
 ):
+    """
+    Asynchronous Redis Cluster Client.
+
+    Automatically routes Redis commands to appropriate cluster nodes asynchronously
+    by tracking keyspace slots via an AsyncClusterMap. Handles redirection.
+    """
+
     def __init__(
         self,
         seeds=None,

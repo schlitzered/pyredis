@@ -17,7 +17,12 @@ class Client(
     commands.String,
     commands.Transaction,
 ):
-    """Base Client for Talking to Redis."""
+    """
+    Synchronous Redis Client.
+
+    Handles connection lifecycle, command execution, and bulk mode operations
+    synchronously, inheriting all standard Redis command mixins.
+    """
 
     def __init__(self, **kwargs):
         super().__init__()

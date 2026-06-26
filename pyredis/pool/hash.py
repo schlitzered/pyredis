@@ -17,6 +17,13 @@ class HashPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Synchronous Redis Hashed Client Connection Pool.
+
+    Acts as a proxy for client commands, leasing a synchronous HashClient
+    to route operations across multiple client-side hashing nodes.
+    """
+
     def __init__(self, buckets, **kwargs):
         super().__init__(**kwargs)
         self._buckets = buckets

@@ -3,6 +3,13 @@ import pyredis.client
 
 
 class AsyncPubSubClient(commands.Subscribe):
+    """
+    Asynchronous Redis Publish/Subscribe Client.
+
+    Supports channel subscription, unsubscription, pattern-based subscriptions,
+    and listening for incoming messages asynchronously.
+    """
+
     def __init__(self, **kwargs):
         self._conn = pyredis.client.AsyncConnection(**kwargs)
 

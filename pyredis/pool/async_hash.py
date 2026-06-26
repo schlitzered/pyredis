@@ -17,6 +17,13 @@ class AsyncHashPool(
     commands.SSet,
     commands.String,
 ):
+    """
+    Asynchronous Redis Hashed Client Connection Pool.
+
+    Acts as a proxy for client commands, leasing an asynchronous AsyncHashClient
+    to route operations across multiple client-side hashing nodes asynchronously.
+    """
+
     def __init__(self, buckets, **kwargs):
         super().__init__(**kwargs)
         self._buckets = buckets

@@ -2,6 +2,8 @@ from pyredis.commands.base import BaseCommand
 
 
 class Transaction(BaseCommand):
+    """Mixin for Redis Transaction / pipeline commands (e.g. MULTI, EXEC, WATCH)."""
+
     def __init__(self):
         super().__init__()
 
