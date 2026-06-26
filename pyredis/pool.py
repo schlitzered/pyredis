@@ -195,10 +195,21 @@ class BasePool(object):
         finally:
             self._lock.release()
 
+    def execute(self, *args, **kwargs):
+        conn = self.acquire()
+        try:
+            return conn.execute(
+                *args,
+                **kwargs
+            )
+        finally:
+            self.release(conn)
+
 
 class ClusterPool(
     BasePool,
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -252,24 +263,11 @@ class ClusterPool(
             username=self.username,
         )
 
-    def execute(self, *args, **kwargs):
-        """Execute arbitrary redis command.
-
-        :param args:
-        :type args: list, int, float
-
-        :return: result, exception
-        """
-        conn = self.acquire()
-        try:
-            return conn.execute(*args, **kwargs)
-        finally:
-            self.release(conn)
-
 
 class HashPool(
     BasePool,
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -329,24 +327,11 @@ class HashPool(
             username=self.username,
         )
 
-    def execute(self, *args, **kwargs):
-        """Execute arbitrary redis command.
-
-        :param args:
-        :type args: list, int, float
-
-        :return: result, exception
-        """
-        conn = self.acquire()
-        try:
-            return conn.execute(*args, **kwargs)
-        finally:
-            self.release(conn)
-
 
 class Pool(
     BasePool,
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -422,24 +407,11 @@ class Pool(
             username=self.username,
         )
 
-    def execute(self, *args):
-        """Execute arbitrary redis command.
-
-        :param args:
-        :type args: list, int, float
-
-        :return: result, exception
-        """
-        conn = self.acquire()
-        try:
-            return conn.execute(*args)
-        finally:
-            self.release(conn)
-
 
 class SentinelHashPool(
     BasePool,
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -599,24 +571,11 @@ class SentinelHashPool(
                     )
         return self._get_hash_client(buckets=buckets)
 
-    def execute(self, *args, **kwargs):
-        """Execute arbitrary redis command.
-
-        :param args:
-        :type args: list, int, float
-
-        :return: result, exception
-        """
-        conn = self.acquire()
-        try:
-            return conn.execute(*args, **kwargs)
-        finally:
-            self.release(conn)
-
 
 class SentinelPool(
     BasePool,
     commands.Connection,
+    commands.Geo,
     commands.Hash,
     commands.HyperLogLog,
     commands.Key,
@@ -748,16 +707,3 @@ class SentinelPool(
         client = self._get_client(host, port)
         return client
 
-    def execute(self, *args):
-        """Execute arbitrary redis command.
-
-        :param args:
-        :type args: list, int, float
-
-        :return: result, exception
-        """
-        conn = self.acquire()
-        try:
-            return conn.execute(*args)
-        finally:
-            self.release(conn)

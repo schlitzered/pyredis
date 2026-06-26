@@ -169,6 +169,39 @@ class TestClientUnit(TestCase):
         client.execute(b'PING')
         client._execute_bulk.assert_called_with(b'PING')
 
+    def test_geo_commands(self):
+        client = pyredis.client.Client(host='127.0.0.1')
+        client.execute = Mock(return_value=b'OK')
+        args_geoadd = (
+            'sicily',
+            13.361389,
+            38.115556,
+            'Palermo',
+        )
+        result_geoadd = client.geoadd(*args_geoadd)
+        self.assertEqual(
+            first=client.execute.call_args[0],
+            second=(b'GEOADD',) + args_geoadd
+        )
+        self.assertEqual(
+            first=result_geoadd,
+            second=b'OK'
+        )
+        args_geodist = (
+            'sicily',
+            'Palermo',
+            'Catania',
+        )
+        result_geodist = client.geodist(*args_geodist)
+        self.assertEqual(
+            first=client.execute.call_args[0],
+            second=(b'GEODIST',) + args_geodist
+        )
+        self.assertEqual(
+            first=result_geodist,
+            second=b'OK'
+        )
+
 
 class TestHashClientUnit(TestCase):
     def setUp(self):
@@ -905,3 +938,26 @@ class TestClusterClientUnit(TestCase):
         self.assertTrue(conn1.close.called)
         self.assertNotIn(conn1, self.client._conns)
         self.clustermap_inst.update.assert_called_with(self.client._map_id)
+
+    def test_geo_commands(self):
+        self.client.execute = Mock(return_value=b'OK')
+        args_geoadd = (
+            'sicily',
+            13.361389,
+            38.115556,
+            'Palermo',
+        )
+        result_geoadd = self.client.geoadd(*args_geoadd)
+        self.assertEqual(
+            first=self.client.execute.call_args[0],
+            second=(b'GEOADD',) + args_geoadd
+        )
+        self.assertEqual(
+            first=self.client.execute.call_args[1],
+            second={'shard_key': 'sicily'}
+        )
+        self.assertEqual(
+            first=result_geoadd,
+            second=b'OK'
+        )
+

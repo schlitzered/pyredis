@@ -2,6 +2,7 @@ __author__ = "schlitzer"
 
 __all__ = [
     "Connection",
+    "Geo",
     "Hash",
     "HyperLogLog",
     "Key",
@@ -14,6 +15,7 @@ __all__ = [
     "Subscribe",
     "Transaction",
 ]
+
 
 
 class BaseCommand(object):

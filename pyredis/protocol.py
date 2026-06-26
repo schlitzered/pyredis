@@ -18,13 +18,20 @@ def is_exception(inst, classinfo):
     try:
         if issubclass(inst, classinfo):
             return True
-        else:
-            raise TypeError()
     except TypeError:
+        pass
+    try:
         if isinstance(inst("test"), classinfo):
             return True
-        else:
-            raise TypeError("{0} is not a subclass of {1}".format(inst, classinfo))
+    except TypeError:
+        pass
+    raise TypeError(
+        "{0} is not a subclass of {1}".format(
+            inst,
+            classinfo
+        )
+    )
+
 
 
 class ReplyParser(object):

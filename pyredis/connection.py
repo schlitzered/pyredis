@@ -129,16 +129,10 @@ class Connection(object):
 
     def _connect_inet46(self):
         try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(self._conn_timeout)
-            sock.connect((self.host, self.port))
-        except socket.gaierror:
-            try:
-                sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-                sock.settimeout(self._conn_timeout)
-                sock.connect((self.host, self.port))
-            except socket.gaierror:
-                raise PyRedisConnError("Host is neither a IPv4 or IPv6 address")
+            sock = socket.create_connection(
+                address=(self.host, self.port),
+                timeout=self._conn_timeout
+            )
         except (
             ConnectionAbortedError,
             ConnectionRefusedError,
@@ -148,9 +142,14 @@ class Connection(object):
         ) as err:
             self.close()
             raise PyRedisConnError(
-                "Could not Connect to {0}:{1}: {2}".format(self.host, self.port, err)
+                "Could not Connect to {0}:{1}: {2}".format(
+                    self.host,
+                    self.port,
+                    err
+                )
             )
         return sock
+
 
     def _connect_unix(self):
         try:
