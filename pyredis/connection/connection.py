@@ -7,7 +7,12 @@ from pyredis.exceptions import ReplyError
 
 
 class Connection(object):
-    """Low level client for talking to a Redis Server."""
+    """
+    Low level client for talking to a Redis Server.
+
+    Manages socket lifecycle, protocol serialization, authentication,
+    and reads/writes for a single synchronous connection.
+    """
 
     def __init__(
         self,
@@ -23,6 +28,22 @@ class Connection(object):
         sentinel=False,
         username=None,
     ):
+        """
+        Initialize connection parameters.
+
+        Args:
+            host: Redis server hostname or IP.
+            port: Redis server port number.
+            unix_sock: Path to Unix domain socket.
+            database: Database index to select.
+            password: Password for authentication.
+            encoding: Optional string encoding for automatic decoding.
+            conn_timeout: Socket connection timeout in seconds.
+            read_only: Flag indicating if the connection is read-only.
+            read_timeout: Socket read timeout in seconds.
+            sentinel: Flag indicating if this is a Sentinel connection.
+            username: Username for ACL authentication.
+        """
         if not bool(host) != bool(unix_sock):
             raise PyRedisError("Ether host or unix_sock has to be provided")
         self._closed = False
@@ -144,6 +165,9 @@ class Connection(object):
                 raise err
 
     def close(self):
+        """
+        Close the socket and clean up connection resources.
+        """
         if self._sock:
             self._sock.close()
         self._sock = None
@@ -152,9 +176,25 @@ class Connection(object):
 
     @property
     def closed(self):
+        """
+        Check if the connection has been closed.
+
+        Returns:
+            True if the connection is closed, False otherwise.
+        """
         return self._closed
 
     def read(self, close_on_timeout=True, raise_on_result_err=True):
+        """
+        Read and parse a reply from the Redis server.
+
+        Args:
+            close_on_timeout: If True, closes the connection on read timeout.
+            raise_on_result_err: If True, raises exceptions returned as replies.
+
+          Returns:
+              Parsed Redis reply (e.g. string, integer, list, dict, or None).
+        """
         if not self._sock:
             self._connect()
         while True:
@@ -181,6 +221,12 @@ class Connection(object):
             self._reader.feed(data)
 
     def write(self, *args):
+        """
+        Serialize and send a command to the Redis server.
+
+        Args:
+            *args: Command name and positional arguments.
+        """
         if not self._sock:
             self._connect()
         data = self._writer(*args)

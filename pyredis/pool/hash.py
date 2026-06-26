@@ -25,12 +25,20 @@ class HashPool(
     """
 
     def __init__(self, buckets, **kwargs):
+        """
+        Initialize the HashPool connection manager.
+
+        Args:
+            buckets: Dict mapping server keyspace slots/buckets to connection options.
+            **kwargs: Additional options forwarded to BasePool.
+        """
         super().__init__(**kwargs)
         self._buckets = buckets
         self._cluster = True
 
     @property
     def buckets(self):
+        """Dict of connection options for node buckets."""
         return self._buckets
 
     def _connect(self):

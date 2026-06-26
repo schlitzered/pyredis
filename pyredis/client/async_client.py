@@ -24,16 +24,33 @@ class AsyncClient(
     """
 
     def __init__(self, **kwargs):
+        """
+        Initialize the AsyncClient connection.
+
+        Args:
+            **kwargs: Connection options forwarded to AsyncConnection.
+        """
         super().__init__()
         self._conn = AsyncConnection(**kwargs)
 
     async def execute(self, *args):
+        """
+        Asynchronously execute a Redis command.
+
+        Args:
+            *args: Command name and positional arguments.
+
+        Returns:
+            Parsed Redis reply.
+        """
         await self._conn.write(*args)
         return await self._conn.read()
 
     async def close(self):
+        """Asynchronously close the underlying connection."""
         await self._conn.close()
 
     @property
     def closed(self):
+        """Flag indicating if connection is closed."""
         return self._conn.closed

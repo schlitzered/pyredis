@@ -21,6 +21,20 @@ class AsyncBasePool(object):
         lock=None,
         username=None,
     ):
+        """
+        Initialize asynchronous connection pool parameters.
+
+        Args:
+            database: Database index to select.
+            password: Password for authentication.
+            encoding: Optional string encoding for automatic decoding.
+            conn_timeout: Async connection timeout in seconds.
+            read_timeout: Async read timeout in seconds.
+            pool_size: Maximum number of connections allowed in the pool.
+            lock: Asyncio lock for synchronization.
+            username: Username for ACL authentication.
+        """
+
         self._conn_timeout = conn_timeout
         self._read_timeout = read_timeout
         if lock is None:
@@ -39,26 +53,32 @@ class AsyncBasePool(object):
 
     @property
     def conn_timeout(self):
+        """Async connection timeout in seconds."""
         return self._conn_timeout
 
     @property
     def read_timeout(self):
+        """Async read timeout in seconds."""
         return self._read_timeout
 
     @property
     def database(self):
+        """Database index selected on connections."""
         return self._database
 
     @property
     def password(self):
+        """Authentication password."""
         return self._password
 
     @property
     def encoding(self):
+        """Optional string decoding encoding."""
         return self._encoding
 
     @property
     def pool_size(self):
+        """Maximum number of connections allowed in the pool."""
         return self._pool_size
 
     @pool_size.setter
@@ -77,16 +97,30 @@ class AsyncBasePool(object):
 
     @property
     def close_on_err(self):
+        """Whether to close all idle connections when a connection closes on error."""
         return self._close_on_err
 
     @property
     def username(self):
+        """ACL authentication username."""
         return self._username
 
     def _connect(self):
         raise NotImplementedError
 
     async def acquire(self):
+        """
+        Asynchronously acquire a connection from the pool.
+
+        Reuses an idle connection or establishes a new one if the pool size limit
+        has not been reached.
+
+        Returns:
+            An AsyncConnection instance.
+
+        Raises:
+            PyRedisError: If the maximum pool size is exceeded.
+        """
         async with self._lock:
             try:
                 client = self._pool_free.pop()
@@ -103,10 +137,17 @@ class AsyncBasePool(object):
                     )
             return client
 
+
     async def release(
         self,
         conn
     ):
+        """
+        Asynchronously release a connection back to the pool.
+
+        Args:
+            conn: The AsyncConnection instance to return.
+        """
         async with self._lock:
             try:
                 current_size = len(self._pool_free) + len(self._pool_used)
@@ -124,11 +165,22 @@ class AsyncBasePool(object):
             except KeyError:
                 await conn.close()
 
+
     async def execute(
         self,
         *args,
         **kwargs
     ):
+        """
+        Asynchronously acquire a connection, execute a command, and release it.
+
+        Args:
+            *args: Command name and positional arguments.
+            **kwargs: Execution options (e.g. shard_key, sock).
+
+        Returns:
+            Parsed Redis reply.
+        """
         conn = await self.acquire()
         try:
             return await conn.execute(
@@ -139,3 +191,4 @@ class AsyncBasePool(object):
             await self.release(
                 conn=conn
             )
+

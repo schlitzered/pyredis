@@ -35,6 +35,18 @@ class AsyncSentinelPool(
         sentinel_username=None,
         **kwargs
     ):
+        """
+        Initialize the AsyncSentinelPool connection manager.
+
+        Args:
+            sentinels: List of Sentinel node addresses (e.g. ['host:port']).
+            name: Name of the master group to monitor.
+            slave_ok: Flag indicating if reading from replica nodes is allowed.
+            retries: Number of connection retries.
+            sentinel_password: Password for Sentinel authentication.
+            sentinel_username: Username for Sentinel ACL authentication.
+            **kwargs: Additional options forwarded to AsyncBasePool.
+        """
         super().__init__(**kwargs)
         self._sentinel = pyredis.pool.AsyncSentinelClient(
             sentinels=sentinels,
@@ -48,14 +60,17 @@ class AsyncSentinelPool(
 
     @property
     def slave_ok(self):
+        """Flag indicating if reading from replica nodes is allowed."""
         return self._slave_ok
 
     @property
     def name(self):
+        """Name of the monitored master group."""
         return self._name
 
     @property
     def retries(self):
+        """Number of connection retries."""
         return self._retries
 
     @property

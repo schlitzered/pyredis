@@ -8,6 +8,13 @@ import pyredis.connection
 
 
 class AsyncConnection(object):
+    """
+    Low level asynchronous client for talking to a Redis Server.
+
+    Manages connection lifecycle, non-blocking network streams via asyncio,
+    protocol serialization, authentication, and async reads/writes.
+    """
+
     def __init__(
         self,
         host=None,
@@ -22,6 +29,23 @@ class AsyncConnection(object):
         sentinel=False,
         username=None,
     ):
+        """
+        Initialize asynchronous connection parameters.
+
+        Args:
+            host: Redis server hostname or IP.
+            port: Redis server port number.
+            unix_sock: Path to Unix domain socket.
+            database: Database index to select.
+            password: Password for authentication.
+            encoding: Optional string encoding for automatic decoding.
+            conn_timeout: Async connection timeout in seconds.
+            read_only: Flag indicating if the connection is read-only.
+            read_timeout: Async socket read timeout in seconds.
+            sentinel: Flag indicating if this is a Sentinel connection.
+            username: Username for ACL authentication.
+        """
+
         if not bool(host) != bool(unix_sock):
             raise PyRedisError("Ether host or unix_sock has to be provided")
         self._closed = False
@@ -128,6 +152,9 @@ class AsyncConnection(object):
                 raise err
 
     async def close(self):
+        """
+        Asynchronously close the socket writer and clean up connection resources.
+        """
         if self._writer:
             self._writer.close()
             try:
@@ -141,9 +168,27 @@ class AsyncConnection(object):
 
     @property
     def closed(self):
+        """
+        Check if the connection has been closed.
+
+        Returns:
+            True if closed, False otherwise.
+        """
         return self._closed
 
+
     async def read(self, close_on_timeout=True, raise_on_result_err=True):
+        """
+        Asynchronously read and parse a reply from the Redis server.
+
+        Args:
+            close_on_timeout: If True, closes the connection on read timeout.
+            raise_on_result_err: If True, raises exceptions returned as replies.
+
+        Returns:
+            Parsed Redis reply (e.g. string, integer, list, dict, or None).
+        """
+
         if not self._writer:
             await self._connect()
         while True:
@@ -173,6 +218,13 @@ class AsyncConnection(object):
             self._reader_parser.feed(data)
 
     async def write(self, *args):
+        """
+        Asynchronously serialize and send a command to the Redis server.
+
+        Args:
+            *args: Command name and positional arguments.
+        """
+
         if not self._writer:
             await self._connect()
         data = self._writer_func(*args)

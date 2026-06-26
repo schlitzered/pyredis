@@ -83,6 +83,9 @@ def get_by_url(
     Args:
         url: The URL containing connection information and options.
         async_client: If True, returns the asynchronous pool or client variant.
+
+    Returns:
+        A connection pool or client instance matching the scheme and configuration.
     """
     scheme, rest = url.split("://", 1)
     conns = list()

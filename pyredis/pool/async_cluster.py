@@ -31,6 +31,16 @@ class AsyncClusterPool(
         username=None,
         **kwargs
     ):
+        """
+        Initialize the AsyncClusterPool connection manager.
+
+        Args:
+            seeds: List of seed node addresses (e.g. ['host:port']).
+            slave_ok: Flag indicating if reading from replica nodes is allowed.
+            password: Password for authentication.
+            username: Username for ACL authentication.
+            **kwargs: Additional options forwarded to AsyncBasePool.
+        """
         super().__init__(
             password=password,
             **kwargs
@@ -45,6 +55,7 @@ class AsyncClusterPool(
 
     @property
     def slave_ok(self):
+        """Flag indicating if reading from replica nodes is allowed."""
         return self._slave_ok
 
     def _connect(self):

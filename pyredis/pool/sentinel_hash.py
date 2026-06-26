@@ -35,6 +35,18 @@ class SentinelHashPool(
         sentinel_username=None,
         **kwargs
     ):
+        """
+        Initialize the SentinelHashPool connection manager.
+
+        Args:
+            sentinels: List of Sentinel node addresses (e.g. ['host:port']).
+            buckets: Dict mapping server keyspace slots/buckets to master group names.
+            slave_ok: Flag indicating if reading from replica nodes is allowed.
+            retries: Number of connection retries.
+            sentinel_password: Password for Sentinel authentication.
+            sentinel_username: Username for Sentinel ACL authentication.
+            **kwargs: Additional options forwarded to BasePool.
+        """
         super().__init__(**kwargs)
         self._sentinel = pyredis.pool.SentinelClient(
             sentinels=sentinels,
@@ -49,14 +61,17 @@ class SentinelHashPool(
 
     @property
     def slave_ok(self):
+        """Flag indicating if reading from replica nodes is allowed."""
         return self._slave_ok
 
     @property
     def buckets(self):
+        """Dict mapping server keyspace slots/buckets to master group names."""
         return self._buckets
 
     @property
     def retries(self):
+        """Number of connection retries."""
         return self._retries
 
     @property
