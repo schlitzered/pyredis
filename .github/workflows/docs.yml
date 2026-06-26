@@ -1,5 +1,4 @@
 name: Publish docs via GitHub Pages
-
 on:
   push:
     branches:
@@ -9,28 +8,16 @@ permissions:
   contents: write
 
 jobs:
-  deploy:
+  build:
     name: Deploy docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout master
+        uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install . sphinx myst-parser
-
-      - name: Build HTML
-        run: |
-          sphinx-build -b html docs/source docs/build/html
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
+      - name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONFIG_FILE: mkdocs.yml
+          REQUIREMENTS: docs/requirements.txt

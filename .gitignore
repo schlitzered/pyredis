@@ -1,5 +1,5 @@
 .idea
 dist
-docs/build
+site/
 venv
 *__pycache__*
