@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install . sphinx
+          pip install . sphinx myst-parser
 
       - name: Build HTML
         run: |

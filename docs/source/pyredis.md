@@ -1,162 +1,182 @@
-API Documentation
-*****************
+# API Documentation
 
-Connection
-==========
+## Connection
 
+```{eval-rst}
 .. autoclass:: pyredis.connection.Connection
     :members:
+```
 
-Client
-======
+## Client
 
-Client
-------
+### Client
 
+```{eval-rst}
 .. autoclass:: pyredis.Client
     :members:
+```
 
-ClusterClient
--------------
+### ClusterClient
 
+```{eval-rst}
 .. autoclass:: pyredis.ClusterClient
     :members:
+```
 
-HashClient
-----------
+### HashClient
 
+```{eval-rst}
 .. autoclass:: pyredis.HashClient
     :members:
+```
 
-PubSubClient
-------------
+### PubSubClient
 
+```{eval-rst}
 .. autoclass:: pyredis.PubSubClient
     :members:
+```
 
-SentinelClient
---------------
+### SentinelClient
 
+```{eval-rst}
 .. autoclass:: pyredis.SentinelClient
     :members:
+```
 
-Pool
-====
+## Pool
 
-BasePool
---------
+### BasePool
 
+```{eval-rst}
 .. autoclass:: pyredis.pool.BasePool
     :members:
+```
 
-ClusterPool
------------
+### ClusterPool
 
+```{eval-rst}
 .. autoclass:: pyredis.ClusterPool
     :members:
+```
 
-HashPool
---------
+### HashPool
 
+```{eval-rst}
 .. autoclass:: pyredis.HashPool
     :members:
+```
 
-Pool
-----
+### Pool
 
+```{eval-rst}
 .. autoclass:: pyredis.Pool
     :members:
+```
 
-SentinelHashPool
-----------------
+### SentinelHashPool
 
+```{eval-rst}
 .. autoclass:: pyredis.SentinelHashPool
     :members:
+```
 
-SentinelPool
-------------
+### SentinelPool
 
+```{eval-rst}
 .. autoclass:: pyredis.SentinelPool
     :members:
+```
 
-Commands
-========
+## Commands
 
-Connection
-----------
+### Connection
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Connection
    :members:
+```
 
-Hash
-----
+### Hash
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Hash
    :members:
+```
 
-HyperLogLog
------------
+### HyperLogLog
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.HyperLogLog
    :members:
+```
 
-Geo
----
+### Geo
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Geo
    :members:
+```
 
-Key
----
+### Key
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Key
    :members:
+```
 
-List
-----
+### List
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.List
    :members:
+```
 
-Publish
--------
+### Publish
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Publish
    :members:
+```
 
-Scripting
----------
+### Scripting
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Scripting
    :members:
+```
 
-Set
----
+### Set
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Set
     :members:
+```
 
-SSet
-----
+### SSet
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.SSet
     :members:
+```
 
-String
-------
+### String
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.String
     :members:
+```
 
-Subscribe
----------
+### Subscribe
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Subscribe
     :members:
+```
 
-Transaction
------------
+### Transaction
 
+```{eval-rst}
 .. autoclass:: pyredis.commands.Transaction
     :members:
-
+```
