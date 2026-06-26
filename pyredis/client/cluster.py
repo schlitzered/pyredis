@@ -38,6 +38,20 @@ class ClusterClient(
         cluster_map=None,
         username=None,
     ):
+        """
+        Initialize the ClusterClient.
+
+        Args:
+            seeds: List of (host, port) tuples representing cluster seeds.
+            database: Redis database index (default: 0).
+            password: Optional password for Redis authentication.
+            encoding: Optional string encoding for decoding responses.
+            slave_ok: If True, allows routing read commands to replicas.
+            conn_timeout: Connection timeout in seconds.
+            read_timeout: Read timeout in seconds.
+            cluster_map: Optional pre-configured ClusterMap instance.
+            username: Optional username for Redis ACL authentication.
+        """
         super().__init__()
         if not bool(seeds) != bool(cluster_map):
             raise PyRedisError("Ether seeds or cluster_map has to be provided")
@@ -101,6 +115,11 @@ class ClusterClient(
 
     @property
     def closed(self):
+        """
+        Flag indicating if all cluster connections are closed.
+
+        Always returns False for ClusterClient.
+        """
         return False
 
     def execute(
@@ -111,6 +130,19 @@ class ClusterClient(
         asking=False,
         retries=3
     ):
+        """
+        Execute a Redis command on the appropriate cluster node.
+
+        Args:
+            *args: Command name and arguments.
+            shard_key: Key used to determine the slot and node for routing.
+            sock: Optional explicit socket identifier (host_port) to route to.
+            asking: Flag indicating if this is an ASKING command redirection.
+            retries: Number of retries on slot redirection before failing.
+
+        Returns:
+            The Redis command response.
+        """
         if not bool(shard_key) != bool(sock):
             raise PyRedisError("Ether shard_key or sock has to be provided")
         if not sock:

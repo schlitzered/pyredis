@@ -36,6 +36,18 @@ class HashClient(
         read_timeout=2,
         username=None,
     ):
+        """
+        Initialize the HashClient.
+
+        Args:
+            buckets: List of (host, port) tuples representing the server buckets.
+            database: Optional Redis database index.
+            password: Optional password for Redis authentication.
+            encoding: Optional string encoding for decoding responses.
+            conn_timeout: Connection timeout in seconds.
+            read_timeout: Read timeout in seconds.
+            username: Optional username for Redis ACL authentication.
+        """
         super().__init__()
         self._conns = dict()
         self._conn_names = list()
@@ -116,9 +128,17 @@ class HashClient(
 
     @property
     def bulk(self):
+        """Flag indicating if bulk mode is active."""
         return self._bulk
 
     def bulk_start(self, bulk_size=5000, keep_results=True):
+        """
+        Start bulk command pipelining mode.
+
+        Args:
+            bulk_size: Maximum commands to queue before reading responses.
+            keep_results: Flag indicating if responses should be returned.
+        """
         if self.bulk:
             raise PyRedisError("Already in bulk mode")
         self._bulk = True
@@ -129,6 +149,12 @@ class HashClient(
             self._bulk_keep = True
 
     def bulk_stop(self):
+        """
+        Stop bulk mode and retrieve results.
+
+        Returns:
+            List of execution results if keep_results was set.
+        """
         if not self.bulk:
             raise PyRedisError("Not in bulk mode")
         self._bulk_fetch()
@@ -141,15 +167,28 @@ class HashClient(
         return results
 
     def close(self):
+        """Close all connections to the server buckets."""
         for conn in self._conns.values():
             conn.close()
         self._closed = True
 
     @property
     def closed(self):
+        """Flag indicating if the client connections are closed."""
         return self._closed
 
     def execute(self, *args, shard_key=None, sock=None):
+        """
+        Execute a command on the appropriate bucket.
+
+        Args:
+            *args: Command name and arguments.
+            shard_key: Key used to calculate the slot and route the command.
+            sock: Optional explicit socket name/bucket to route to.
+
+        Returns:
+            The Redis command response, or None if in bulk mode.
+        """
         if not bool(shard_key) != bool(sock):
             raise PyRedisError("Ether shard_key or sock has to be provided")
         if not sock:

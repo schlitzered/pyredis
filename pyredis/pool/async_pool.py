@@ -32,6 +32,15 @@ class AsyncPool(
         unix_sock=None,
         **kwargs
     ):
+        """
+        Initialize the AsyncPool connection manager.
+
+        Args:
+            host: Redis server hostname or IP.
+            port: Redis server port number.
+            unix_sock: Path to Unix domain socket.
+            **kwargs: Additional options forwarded to AsyncBasePool.
+        """
         if not bool(host) != bool(unix_sock):
             raise PyRedisError("Ether host or unix_sock has to be provided")
         super().__init__(**kwargs)
@@ -41,14 +50,17 @@ class AsyncPool(
 
     @property
     def host(self):
+        """Hostname or IP of the Redis server."""
         return self._host
 
     @property
     def port(self):
+        """Port number of the Redis server."""
         return self._port
 
     @property
     def unix_sock(self):
+        """Path to the Unix domain socket."""
         return self._unix_sock
 
     def _connect(self):

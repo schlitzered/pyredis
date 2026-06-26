@@ -25,6 +25,12 @@ class Client(
     """
 
     def __init__(self, **kwargs):
+        """
+        Initialize the Client connection.
+
+        Args:
+            **kwargs: Connection options forwarded to Connection.
+        """
         super().__init__()
         self._conn = pyredis.client.Connection(**kwargs)
         self._bulk = False
@@ -52,9 +58,17 @@ class Client(
 
     @property
     def bulk(self):
+        """Flag indicating if bulk mode is active."""
         return self._bulk
 
     def bulk_start(self, bulk_size=5000, keep_results=True):
+        """
+        Start bulk command pipelining mode.
+
+        Args:
+            bulk_size: Maximum commands to queue before reading responses.
+            keep_results: Flag indicating if responses should be returned.
+        """
         if self.bulk:
             raise PyRedisError("Already in bulk mode")
         self._bulk = True
@@ -65,6 +79,12 @@ class Client(
             self._bulk_keep = True
 
     def bulk_stop(self):
+        """
+        Stop bulk mode and retrieve results.
+
+        Returns:
+            List of execution results if keep_results was set.
+        """
         if not self.bulk:
             raise PyRedisError("Not in bulk mode")
         self._bulk_fetch()
@@ -77,13 +97,24 @@ class Client(
         return results
 
     def close(self):
+        """Close the underlying connection."""
         self._conn.close()
 
     @property
     def closed(self):
+        """Flag indicating if connection is closed."""
         return self._conn.closed
 
     def execute(self, *args):
+        """
+        Execute a Redis command.
+
+        Args:
+            *args: Command name and positional arguments.
+
+        Returns:
+            Parsed Redis reply.
+        """
         if not self._bulk:
             return self._execute_basic(*args)
         else:
