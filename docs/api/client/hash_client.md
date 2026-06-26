@@ -1,0 +1,3 @@
+# HashClient
+
+::: pyredis.HashClient

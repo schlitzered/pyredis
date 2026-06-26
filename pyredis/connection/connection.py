@@ -1,65 +1,13 @@
-from pyredis.exceptions import *
-from pyredis.protocol import writer
-import socket
-
-try:
-    from hiredis import Reader
-except ImportError:
-    from pyredis.protocol import Reader
-
-__all__ = ["Connection"]
+import pyredis.connection
+from pyredis.exceptions import PyRedisConnClosed
+from pyredis.exceptions import PyRedisConnError
+from pyredis.exceptions import PyRedisConnReadTimeout
+from pyredis.exceptions import PyRedisError
+from pyredis.exceptions import ReplyError
 
 
 class Connection(object):
-    """Low level client for talking to a Redis Server.
-
-    This class is should not be used directly to talk to a Redis server,
-    unless you know what you are doing. In most cases it should be
-    sufficient to use one of the Client classes, or one of the Connection Pools.
-
-    :param host:
-        Host IP or Name to connect,
-        can only be set when unix_sock is None.
-    :type host: str
-
-    :param port:
-        Port to connect, only used when host is also set.
-    :type port: int
-
-    :param unix_sock:
-        Unix Socket to connect,
-        can only be set when host is None.
-    :type unix_sock: str
-
-    :param database:
-        Select which db should be used for this connection, defaults to None, so we use the default database 0
-    :type database: int
-
-    :param password:
-        Password used for authentication. If None, no authentication is done
-    :type password: str
-
-    :param encoding:
-        Convert result strings with this encoding. If None, no encoding is done.
-    :type encoding: str
-
-    :param conn_timeout:
-        Connect Timeout.
-    :type conn_timeout: float
-
-    :param read_timeout:
-        Read Timeout.
-    :type read_timeout: float
-
-    :param sentinel:
-        If True, authentication and database selection is skipped.
-    :type sentinel: bool
-
-    :param username:
-        Username used for acl scl authentication. If not set, fall back use legacy auth.
-    :type username: str
-
-    """
+    """Low level client for talking to a Redis Server."""
 
     def __init__(
         self,
@@ -84,7 +32,7 @@ class Connection(object):
         self._encoding = encoding
         self._reader = None
         self._sentinel = sentinel
-        self._writer = writer
+        self._writer = pyredis.connection.writer
         self._sock = None
         self.host = host
         self.port = port
@@ -95,14 +43,18 @@ class Connection(object):
 
     def _authenticate(self):
         if self.username and self.password:
-            self.write("AUTH", self.username, self.password)
+            self.write(
+                *["AUTH", self.username, self.password]
+            )
             try:
                 self.read()
             except ReplyError as err:
                 self.close()
                 raise err
         elif self.password:
-            self.write("AUTH", self.password)
+            self.write(
+                *["AUTH", self.password]
+            )
             try:
                 self.read()
             except ReplyError as err:
@@ -118,9 +70,9 @@ class Connection(object):
             sock = self._connect_unix()
         self._sock = sock
         if self._encoding:
-            self._reader = Reader(encoding=self._encoding)
+            self._reader = pyredis.connection.Reader(encoding=self._encoding)
         else:
-            self._reader = Reader()
+            self._reader = pyredis.connection.Reader()
         self._authenticate()
         if not self._sentinel:
             self._setdb()
@@ -129,7 +81,7 @@ class Connection(object):
 
     def _connect_inet46(self):
         try:
-            sock = socket.create_connection(
+            sock = pyredis.connection.socket.create_connection(
                 address=(self.host, self.port),
                 timeout=self._conn_timeout
             )
@@ -137,35 +89,33 @@ class Connection(object):
             ConnectionAbortedError,
             ConnectionRefusedError,
             OverflowError,
-            socket.timeout,
+            pyredis.connection.socket.timeout,
             OSError,
         ) as err:
             self.close()
             raise PyRedisConnError(
-                "Could not Connect to {0}:{1}: {2}".format(
-                    self.host,
-                    self.port,
-                    err
-                )
+                f"Could not Connect to {self.host}:{self.port}: {err}"
             )
         return sock
 
-
     def _connect_unix(self):
         try:
-            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock = pyredis.connection.socket.socket(
+                family=pyredis.connection.socket.AF_UNIX,
+                type=pyredis.connection.socket.SOCK_STREAM,
+            )
             sock.settimeout(self._conn_timeout)
             sock.connect(self.unix_sock)
         except (
             ConnectionAbortedError,
             ConnectionRefusedError,
             FileNotFoundError,
-            socket.timeout,
+            pyredis.connection.socket.timeout,
             OSError,
         ) as err:
             self.close()
             raise PyRedisConnError(
-                "Could not Connect to {0}: {1}".format(self.host, err)
+                f"Could not Connect to {self.host}: {err}"
             )
         return sock
 
@@ -175,7 +125,9 @@ class Connection(object):
         if self.database is None:
             return
         self._sock.settimeout(0.1)
-        self.write("SELECT", self.database)
+        self.write(
+            *["SELECT", self.database]
+        )
         try:
             self.read()
         except ReplyError as err:
@@ -192,12 +144,6 @@ class Connection(object):
                 raise err
 
     def close(self):
-        """Close Client Connection.
-
-        This closes the underlying socket, and mark the connection as closed.
-
-        :return: None
-        """
         if self._sock:
             self._sock.close()
         self._sock = None
@@ -209,18 +155,6 @@ class Connection(object):
         return self._closed
 
     def read(self, close_on_timeout=True, raise_on_result_err=True):
-        """Read result from the socket.
-
-        :param close_on_timeout:
-            Close the connection after a read timeout
-        :type close_on_timeout: book
-
-        :param raise_on_result_err:
-            Raise exception on protocol errors
-        :type raise_on_result_err: bool
-
-        :return: result, exception
-        """
         if not self._sock:
             self._connect()
         while True:
@@ -232,10 +166,12 @@ class Connection(object):
                 return result
             try:
                 data = self._sock.recv(1500)
-            except socket.timeout:
+            except pyredis.connection.socket.timeout:
                 if close_on_timeout:
                     self.close()
-                raise PyRedisConnReadTimeout("Connection timeout while reading")
+                raise PyRedisConnReadTimeout(
+                    "Connection timeout while reading"
+                )
             except ConnectionResetError:
                 self.close()
                 raise PyRedisConnError("Connection reset by peer")
@@ -245,14 +181,6 @@ class Connection(object):
             self._reader.feed(data)
 
     def write(self, *args):
-        """Write commands to socket.
-
-        :param args:
-            Accepts a variable number of arguments
-        :type args: str, int, float
-
-        :return: None
-        """
         if not self._sock:
             self._connect()
         data = self._writer(*args)
@@ -260,4 +188,6 @@ class Connection(object):
             self._sock.sendall(data)
         except BrokenPipeError as err:
             self.close()
-            raise PyRedisConnError("Connection lost while writing: {0}".format(err))
+            raise PyRedisConnError(
+                f"Connection lost while writing: {err}"
+            )

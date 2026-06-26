@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "python_redis"
-version = "0.4.1"
+version = "1.0.0"
 requires-python = ">=3.9"
 authors = [
   {name = "Stephan Schultchen", email = "stephan.schultchen@gmail.com"},

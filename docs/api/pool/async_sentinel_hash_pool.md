@@ -1,0 +1,3 @@
+# AsyncSentinelHashPool
+
+::: pyredis.AsyncSentinelHashPool

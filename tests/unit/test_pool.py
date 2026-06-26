@@ -464,7 +464,10 @@ class TestSentinelPoolUnit(TestCase):
         pool._get_client.return_value = client_mock
         client = pool._get_master()
         pool._sentinel.get_master.assert_called_with('mymaster')
-        pool._get_client.assert_called_with(b'127.0.0.1', 12345)
+        pool._get_client.assert_called_with(
+            host=b'127.0.0.1',
+            port=12345
+        )
         self.assertEqual(client, client_mock)
 
     def test_get_slave(self):
@@ -500,5 +503,8 @@ class TestSentinelPoolUnit(TestCase):
                 (b'127.0.0.3', 12345)
             ]
         )
-        pool._get_client.assert_called_with(b'127.0.0.1', 12345)
+        pool._get_client.assert_called_with(
+            host=b'127.0.0.1',
+            port=12345
+        )
         self.assertEqual(client, client_mock1)

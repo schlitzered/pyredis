@@ -1,0 +1,3 @@
+# AsyncSentinelClient
+
+::: pyredis.AsyncSentinelClient

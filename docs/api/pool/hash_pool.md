@@ -1,0 +1,3 @@
+# HashPool
+
+::: pyredis.HashPool

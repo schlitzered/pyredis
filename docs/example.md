@@ -140,3 +140,159 @@ client.publish('/blub', 'test')
 subscribe.get()
 [b'message', b'/blub', b'test']
 ```
+
+## Asynchronous Client and Pool Usage
+
+### Simple Async Client Usage
+
+```python
+import asyncio
+from pyredis import AsyncClient
+
+async def main():
+    client = AsyncClient(host="localhost")
+    await client.ping()
+    await client.close()
+
+asyncio.run(main())
+```
+
+### Async Bulk Mode
+
+```python
+import asyncio
+from pyredis import AsyncClient
+
+async def main():
+    client = AsyncClient(host="localhost")
+    await client.bulk_start()
+    await client.set("key1", "value1")
+    await client.set("key2", "value2")
+    await client.set("key3", "value3")
+    results = await client.bulk_stop()
+    print(results)
+    await client.close()
+
+asyncio.run(main())
+```
+
+### Using an Async Connection Pool
+
+```python
+import asyncio
+from pyredis import AsyncPool
+
+async def main():
+    pool = AsyncPool(host="localhost")
+    client = await pool.acquire()
+    await client.ping()
+    await pool.release(client)
+
+asyncio.run(main())
+```
+
+### Using an Async Cluster Connection Pool
+
+```python
+import asyncio
+from pyredis import AsyncClusterPool
+
+async def main():
+    pool = AsyncClusterPool(
+        seeds=[
+            ("seed1", 6379),
+            ("seed2", 6379)
+        ]
+    )
+    client = await pool.acquire()
+    await client.ping(shard_key="test")
+    await pool.release(client)
+
+asyncio.run(main())
+```
+
+### Using an Async Hash Connection Pool
+
+```python
+import asyncio
+from pyredis import AsyncHashPool
+
+async def main():
+    pool = AsyncHashPool(
+        buckets=[
+            ("host1", 6379),
+            ("host2", 6379)
+        ]
+    )
+    client = await pool.acquire()
+    await client.ping(shard_key="test")
+    await pool.release(client)
+
+asyncio.run(main())
+```
+
+### Using an Async Sentinel backed Connection Pool
+
+```python
+import asyncio
+from pyredis import AsyncSentinelPool
+
+async def main():
+    pool = AsyncSentinelPool(
+        sentinels=[
+            ("sentinel1", 26379),
+            ("sentinel2", 26379)
+        ],
+        name="mymaster"
+    )
+    client = await pool.acquire()
+    await client.ping()
+    await pool.release(client)
+
+asyncio.run(main())
+```
+
+### Getting Async Pools/Clients by URL
+
+```python
+from pyredis import get_by_url
+
+pool = get_by_url(
+    url="redis://localhost?password=topsecret",
+    async_client=True
+)
+
+pubsub = get_by_url(
+    url="pubsub://localhost?password=topsecret",
+    async_client=True
+)
+```
+
+### Async Publish Subscribe
+
+```python
+import asyncio
+from pyredis import AsyncClient
+from pyredis import AsyncPubSubClient
+
+async def main():
+    client = AsyncClient(host="localhost")
+    subscribe = AsyncPubSubClient(host="localhost")
+
+    await subscribe.subscribe("/blub")
+    res1 = await subscribe.get()
+    print(res1)
+
+    await client.publish(
+        "/blub",
+        "test"
+    )
+    res2 = await subscribe.get()
+    print(res2)
+
+    await client.close()
+    await subscribe.close()
+
+asyncio.run(main())
+```
+
